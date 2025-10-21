@@ -1,135 +1,139 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>مبدل الصوت المحلي 🎤</title>
-  <style>
-    body {
-      background-color: #111;
-      color: #fff;
-      font-family: "Tajawal", sans-serif;
-      text-align: center;
-      padding: 30px;
-    }
-    button, select {
-      margin: 10px;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-    }
-    button {
-      background: #444;
-      color: #fff;
-      cursor: pointer;
-    }
-    button:hover { background: #666; }
-    audio { margin-top: 20px; width: 90%; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎧 محرر الصوت الذكي</title>
+<style>
+  body {
+    background: #0d0d0d;
+    color: #fff;
+    font-family: "Tajawal", sans-serif;
+    text-align: center;
+    padding: 25px;
+  }
+  h2 { color: #00d1ff; }
+  button {
+    background: #1f1f1f;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  button:hover { background: #333; }
+  input[type="range"] {
+    width: 80%;
+    accent-color: #00d1ff;
+  }
+  .control {
+    background: #1a1a1a;
+    padding: 15px;
+    border-radius: 12px;
+    margin: 10px auto;
+    width: 90%;
+    max-width: 400px;
+  }
+  label { display: block; margin-bottom: 5px; color: #ccc; }
+  audio { margin-top: 20px; width: 90%; }
+</style>
 </head>
 <body>
 
-  <h2>🎙️ مبدل الصوت المحلي</h2>
-  <select id="effect">
-    <option value="normal">عادي</option>
-    <option value="echo">صدى</option>
-    <option value="robot">روبوت</option>
-    <option value="deep">صوت غليظ</option>
-    <option value="chipmunk">صوت بنت</option>
-  </select>
-  <br>
+<h2>🎙️ مبدل الصوت الاحترافي</h2>
 
+<div>
   <button id="startBtn">🎤 بدء التسجيل</button>
   <button id="stopBtn" disabled>⏹️ إيقاف</button>
-  <br>
   <button id="playBtn" disabled>▶️ تشغيل الصوت المعدل</button>
+</div>
 
-  <audio id="audio" controls></audio>
+<!-- عناصر التحكم -->
+<div class="control">
+  <label>🔊 مستوى الصوت: <span id="volumeVal">1</span></label>
+  <input type="range" id="volume" min="0" max="2" step="0.1" value="1">
+</div>
 
-  <script>
-    let chunks = [];
-    let recorder;
-    let audioContext;
-    let modifiedBuffer;
+<div class="control">
+  <label>🎚️ نغمة الصوت (Pitch): <span id="pitchVal">1</span></label>
+  <input type="range" id="pitch" min="0.5" max="2" step="0.1" value="1">
+</div>
 
-    document.getElementById('startBtn').onclick = async () => {
-      let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      recorder = new MediaRecorder(stream);
-      chunks = [];
+<div class="control">
+  <label>⏩ سرعة التشغيل: <span id="speedVal">1</span></label>
+  <input type="range" id="speed" min="0.5" max="2" step="0.1" value="1">
+</div>
 
-      recorder.ondataavailable = e => chunks.push(e.data);
-      recorder.onstop = async () => {
-        let blob = new Blob(chunks, { type: 'audio/webm' });
-        let arrayBuffer = await blob.arrayBuffer();
+<div class="control">
+  <label>🌊 الصدى (Echo): <span id="echoVal">0</span></label>
+  <input type="range" id="echo" min="0" max="0.8" step="0.05" value="0">
+</div>
 
-        audioContext = new AudioContext();
-        let buffer = await audioContext.decodeAudioData(arrayBuffer);
+<audio id="audio" controls></audio>
 
-        // تطبيق التأثير
-        modifiedBuffer = applyEffect(buffer, document.getElementById('effect').value);
+<script>
+let chunks = [];
+let recorder;
+let audioContext;
+let recordedBuffer;
 
-        let output = audioContext.createBufferSource();
-        output.buffer = modifiedBuffer;
-        let dest = audioContext.createMediaStreamDestination();
-        output.connect(dest);
-        output.start();
+document.getElementById('startBtn').onclick = async () => {
+  let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  recorder = new MediaRecorder(stream);
+  chunks = [];
+  recorder.ondataavailable = e => chunks.push(e.data);
+  recorder.onstop = async () => {
+    let blob = new Blob(chunks, { type: 'audio/webm' });
+    let arrayBuffer = await blob.arrayBuffer();
+    audioContext = new AudioContext();
+    recordedBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    document.getElementById('playBtn').disabled = false;
+  };
+  recorder.start();
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('stopBtn').disabled = false;
+};
 
-        // تحويل الصوت المعدل إلى Blob للتشغيل
-        let recorded = new Blob(chunks, { type: 'audio/webm' });
-        document.getElementById('audio').src = URL.createObjectURL(recorded);
-        document.getElementById('playBtn').disabled = false;
-      };
+document.getElementById('stopBtn').onclick = () => {
+  recorder.stop();
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('stopBtn').disabled = true;
+};
 
-      recorder.start();
-      document.getElementById('startBtn').disabled = true;
-      document.getElementById('stopBtn').disabled = false;
-    };
+document.getElementById('playBtn').onclick = () => {
+  if (!recordedBuffer) return;
+  const ctx = new AudioContext();
+  const src = ctx.createBufferSource();
+  src.buffer = recordedBuffer;
 
-    document.getElementById('stopBtn').onclick = () => {
-      recorder.stop();
-      document.getElementById('startBtn').disabled = false;
-      document.getElementById('stopBtn').disabled = true;
-    };
+  // إعداد الفلاتر حسب القيم
+  const gainNode = ctx.createGain();
+  gainNode.gain.value = parseFloat(document.getElementById('volume').value);
 
-    document.getElementById('playBtn').onclick = () => {
-      document.getElementById('audio').play();
-    };
+  const delayNode = ctx.createDelay();
+  delayNode.delayTime.value = parseFloat(document.getElementById('echo').value);
 
-    function applyEffect(buffer, type) {
-      const ctx = new OfflineAudioContext(1, buffer.length, buffer.sampleRate);
-      const src = ctx.createBufferSource();
-      src.buffer = buffer;
+  src.playbackRate.value = parseFloat(document.getElementById('speed').value);
 
-      let node = ctx.createGain();
+  // Pitch adjustment (تغيير النغمة)
+  const pitch = parseFloat(document.getElementById('pitch').value);
+  src.playbackRate.value *= pitch;
 
-      switch (type) {
-        case "echo":
-          const delay = ctx.createDelay();
-          delay.delayTime.value = 0.25;
-          const feedback = ctx.createGain();
-          feedback.gain.value = 0.4;
-          src.connect(delay);
-          delay.connect(feedback);
-          feedback.connect(delay);
-          delay.connect(node);
-          break;
-        case "robot":
-          node.gain.value = 1.5;
-          break;
-        case "deep":
-          src.playbackRate.value = 0.8;
-          break;
-        case "chipmunk":
-          src.playbackRate.value = 1.5;
-          break;
-      }
+  src.connect(gainNode);
+  gainNode.connect(delayNode);
+  delayNode.connect(ctx.destination);
+  src.start();
 
-      src.connect(node);
-      node.connect(ctx.destination);
-      src.start(0);
-      return buffer;
-    }
-  </script>
+  // عرض التحديثات اللحظية
+  document.getElementById('volumeVal').textContent = gainNode.gain.value;
+  document.getElementById('pitchVal').textContent = pitch;
+  document.getElementById('speedVal').textContent = document.getElementById('speed').value;
+  document.getElementById('echoVal').textContent = document.getElementById('echo').value;
+};
+</script>
+
 </body>
 </html>
