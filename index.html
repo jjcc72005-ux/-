@@ -1,16 +1,23 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موقع تسجيل وتعديل الصوت</title>
+    <title>استوديو الصوت | تسجيل وتعديل الصوت</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #4a6fa5;
-            --secondary-color: #6b8cbc;
-            --accent-color: #ff6b6b;
-            --light-color: #f8f9fa;
-            --dark-color: #343a40;
+            --primary: #00d4ff;
+            --secondary: #ff2a6d;
+            --accent: #05d9e8;
+            --dark: #0c0e1c;
+            --darker: #050711;
+            --light: #a5b3d6;
+            --text: #e0e0e0;
+            --card-bg: #12152e;
+            --success: #00ff9d;
+            --warning: #ffcc00;
+            --danger: #ff2a6d;
         }
         
         * {
@@ -21,35 +28,70 @@
         }
         
         body {
-            background-color: #f5f7fa;
-            color: var(--dark-color);
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--text);
             line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
         
         header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
+            background: rgba(12, 14, 28, 0.8);
+            backdrop-filter: blur(10px);
             padding: 1.5rem 0;
             text-align: center;
-            border-radius: 10px;
+            border-radius: 20px;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
         }
         
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
         }
         
         .subtitle {
             font-size: 1.2rem;
             opacity: 0.9;
+            color: var(--light);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5));
         }
         
         .main-content {
@@ -58,222 +100,426 @@
             gap: 2rem;
         }
         
-        @media (max-width: 768px) {
+        @media (max-width: 1100px) {
             .main-content {
                 grid-template-columns: 1fr;
             }
         }
         
         .card {
-            background: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.8rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            margin-bottom: 1.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-header i {
+            color: var(--primary);
+            font-size: 1.5rem;
         }
         
         .card h2 {
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #eee;
+            color: var(--text);
+            font-size: 1.5rem;
+            font-weight: 600;
         }
         
         .recorder-controls {
             display: flex;
             justify-content: center;
-            gap: 1rem;
-            margin: 1.5rem 0;
+            gap: 1.5rem;
+            margin: 2rem 0;
         }
         
-        button {
-            background-color: var(--primary-color);
-            color: white;
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: var(--darker);
             border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 5px;
+            padding: 1rem 2rem;
+            border-radius: 50px;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.8rem;
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
         }
         
-        button:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-2px);
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.4);
         }
         
-        button:disabled {
-            background-color: #cccccc;
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn:disabled {
+            background: #555;
+            color: #999;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
         
         .btn-danger {
-            background-color: var(--accent-color);
+            background: linear-gradient(135deg, var(--danger), #ff6b9c);
         }
         
         .btn-danger:hover {
-            background-color: #ff5252;
+            box-shadow: 0 8px 20px rgba(255, 42, 109, 0.4);
         }
         
         .btn-success {
-            background-color: #28a745;
+            background: linear-gradient(135deg, var(--success), #00cc88);
         }
         
         .btn-success:hover {
-            background-color: #218838;
+            box-shadow: 0 8px 20px rgba(0, 255, 157, 0.4);
         }
         
-        .visualizer {
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #ffdd44);
+        }
+        
+        .btn-warning:hover {
+            box-shadow: 0 8px 20px rgba(255, 204, 0, 0.4);
+        }
+        
+        .visualizer-container {
+            position: relative;
             width: 100%;
-            height: 150px;
-            background-color: #f0f0f0;
-            border-radius: 5px;
-            margin: 1rem 0;
+            height: 200px;
+            background: linear-gradient(180deg, rgba(10, 12, 25, 0.8), rgba(5, 7, 17, 0.9));
+            border-radius: 15px;
+            margin: 1.5rem 0;
             overflow: hidden;
+            border: 1px solid rgba(0, 212, 255, 0.1);
         }
         
-        canvas {
+        #visualizer {
             width: 100%;
             height: 100%;
         }
         
         .audio-player {
             width: 100%;
-            margin: 1rem 0;
+            margin: 1.5rem 0;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
         }
         
-        .tools {
+        .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
         }
         
-        .tool {
-            background-color: #f8f9fa;
-            padding: 1rem;
-            border-radius: 5px;
-            border-left: 4px solid var(--primary-color);
+        .tool-card {
+            background: rgba(20, 23, 50, 0.6);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
         }
         
-        .tool h3 {
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-            color: var(--dark-color);
+        .tool-card:hover {
+            background: rgba(25, 28, 60, 0.8);
+            border-left-color: var(--accent);
+        }
+        
+        .tool-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tool-card h3 i {
+            color: var(--primary);
         }
         
         .tool-controls {
             display: flex;
             flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .range-container {
+            display: flex;
+            flex-direction: column;
             gap: 0.5rem;
+        }
+        
+        .range-value {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--light);
         }
         
         input[type="range"] {
             width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+        
+        input[type="number"], select {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            font-size: 1rem;
+        }
+        
+        .voice-effects {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .voice-effect {
+            background: rgba(20, 23, 50, 0.6);
+            border-radius: 15px;
+            padding: 1.2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .voice-effect:hover {
+            transform: translateY(-5px);
+            background: rgba(25, 28, 60, 0.8);
+            border-color: var(--primary);
+        }
+        
+        .voice-effect.active {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+        
+        .voice-effect i {
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+            color: var(--primary);
         }
         
         .file-upload {
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
         }
         
-        .file-input {
-            padding: 0.8rem;
-            border: 2px dashed #ddd;
-            border-radius: 5px;
+        .file-input-label {
+            padding: 1.5rem;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
         }
         
-        .file-input:hover {
-            border-color: var(--primary-color);
-            background-color: #f0f7ff;
+        .file-input-label:hover {
+            border-color: var(--primary);
+            background: rgba(0, 212, 255, 0.05);
+        }
+        
+        .file-input-label i {
+            font-size: 2.5rem;
+            color: var(--primary);
         }
         
         .status {
-            padding: 0.8rem;
-            border-radius: 5px;
-            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
             text-align: center;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         
         .status.recording {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
+            background: rgba(255, 42, 109, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(255, 42, 109, 0.3);
         }
         
         .status.processing {
-            background-color: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(0, 212, 255, 0.3);
         }
         
         .status.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: rgba(0, 255, 157, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(0, 255, 157, 0.3);
         }
         
         footer {
             text-align: center;
-            margin-top: 2rem;
-            padding: 1rem;
-            color: #6c757d;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            color: var(--light);
             font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .pulse {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--danger);
+            box-shadow: 0 0 0 rgba(255, 42, 109, 0.4);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 42, 109, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 42, 109, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 42, 109, 0);
+            }
         }
         
         .hidden {
             display: none;
+        }
+        
+        /* تأثيرات إضافية للواجهة */
+        .glow {
+            text-shadow: 0 0 10px currentColor;
+        }
+        
+        /* شريط التقدم */
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>موقع تسجيل وتعديل الصوت</h1>
-            <p class="subtitle">سجل صوتك وقم بتعديله باستخدام الأدوات المتاحة</p>
+            <div class="logo">
+                <i class="fas fa-wave-square logo-icon"></i>
+                <h1>استوديو الصوت</h1>
+            </div>
+            <p class="subtitle">سجل صوتك وغير نبرته باستخدام أحدث التقنيات</p>
         </header>
         
         <div class="main-content">
             <div class="left-column">
                 <div class="card">
-                    <h2>تسجيل الصوت</h2>
-                    <div class="visualizer">
+                    <div class="card-header">
+                        <i class="fas fa-microphone"></i>
+                        <h2>تسجيل الصوت</h2>
+                    </div>
+                    
+                    <div class="visualizer-container">
                         <canvas id="visualizer"></canvas>
                     </div>
+                    
                     <div class="recorder-controls">
-                        <button id="startRecord">
+                        <button id="startRecord" class="btn">
+                            <i class="fas fa-record-vinyl"></i>
                             <span>بدء التسجيل</span>
                         </button>
-                        <button id="stopRecord" disabled>
+                        <button id="stopRecord" class="btn btn-danger" disabled>
+                            <i class="fas fa-stop"></i>
                             <span>إيقاف التسجيل</span>
                         </button>
                     </div>
-                    <div id="recordStatus" class="status hidden"></div>
+                    
+                    <div id="recordStatus" class="status hidden">
+                        <i class="fas fa-info-circle"></i>
+                        <span>جاهز للتسجيل</span>
+                    </div>
                     
                     <div class="file-upload">
-                        <label for="audioUpload" class="file-input">
-                            أو قم برفع ملف صوتي
+                        <label for="audioUpload" class="file-input-label">
+                            <i class="fas fa-file-upload"></i>
+                            <span>اسحب وأفلت ملف صوتي هنا أو انقر للاختيار</span>
                         </label>
                         <input type="file" id="audioUpload" accept="audio/*" class="hidden">
                     </div>
                 </div>
                 
                 <div class="card">
-                    <h2>استمع إلى التسجيل</h2>
+                    <div class="card-header">
+                        <i class="fas fa-play-circle"></i>
+                        <h2>استمع إلى التسجيل</h2>
+                    </div>
                     <audio id="audioPlayer" controls class="audio-player"></audio>
                     <div class="recorder-controls">
-                        <button id="downloadAudio" disabled>
-                            <span>تحميل الصوت</span>
+                        <button id="downloadAudio" class="btn btn-success" disabled>
+                            <i class="fas fa-download"></i>
+                            <span>تحميل الصوت المعدل</span>
                         </button>
                     </div>
                 </div>
@@ -281,61 +527,107 @@
             
             <div class="right-column">
                 <div class="card">
-                    <h2>أدوات تعديل الصوت</h2>
-                    <div class="tools">
-                        <div class="tool">
-                            <h3>مستوى الصوت</h3>
+                    <div class="card-header">
+                        <i class="fas fa-sliders-h"></i>
+                        <h2>أدوات تعديل الصوت</h2>
+                    </div>
+                    
+                    <div class="tools-grid">
+                        <div class="tool-card">
+                            <h3><i class="fas fa-volume-up"></i> مستوى الصوت</h3>
                             <div class="tool-controls">
-                                <input type="range" id="volumeControl" min="0" max="2" step="0.1" value="1">
-                                <span id="volumeValue">100%</span>
+                                <div class="range-container">
+                                    <div class="range-value">
+                                        <span>0%</span>
+                                        <span id="volumeValue">100%</span>
+                                    </div>
+                                    <input type="range" id="volumeControl" min="0" max="2" step="0.1" value="1">
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="tool">
-                            <h3>قص الصوت</h3>
+                        <div class="tool-card">
+                            <h3><i class="fas fa-cut"></i> قص الصوت</h3>
                             <div class="tool-controls">
                                 <label for="startTime">بداية القص (ثانية):</label>
                                 <input type="number" id="startTime" min="0" value="0" step="0.1">
                                 <label for="endTime">نهاية القص (ثانية):</label>
                                 <input type="number" id="endTime" min="0" value="0" step="0.1">
-                                <button id="applyTrim" class="btn-success">تطبيق القص</button>
+                                <button id="applyTrim" class="btn btn-success" style="margin-top: 10px; padding: 0.7rem;">
+                                    <i class="fas fa-check"></i>
+                                    <span>تطبيق القص</span>
+                                </button>
                             </div>
                         </div>
                         
-                        <div class="tool">
-                            <h3>تأثيرات الصوت</h3>
+                        <div class="tool-card">
+                            <h3><i class="fas fa-tachometer-alt"></i> سرعة التشغيل</h3>
                             <div class="tool-controls">
-                                <select id="effectSelect">
-                                    <option value="none">بدون تأثير</option>
-                                    <option value="echo">صدى</option>
-                                    <option value="reverb">صدي</option>
-                                    <option value="distortion">تشويه</option>
-                                </select>
-                                <button id="applyEffect" class="btn-success">تطبيق التأثير</button>
+                                <div class="range-container">
+                                    <div class="range-value">
+                                        <span>0.5x</span>
+                                        <span id="playbackRateValue">1x</span>
+                                        <span>2x</span>
+                                    </div>
+                                    <input type="range" id="playbackRate" min="0.5" max="2" step="0.1" value="1">
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="tool">
-                            <h3>سرعة التشغيل</h3>
+                        <div class="tool-card">
+                            <h3><i class="fas fa-waveform"></i> نغمة الصوت</h3>
                             <div class="tool-controls">
-                                <input type="range" id="playbackRate" min="0.5" max="2" step="0.1" value="1">
-                                <span id="playbackRateValue">1x</span>
+                                <div class="range-container">
+                                    <div class="range-value">
+                                        <span>منخفضة</span>
+                                        <span id="pitchValue">طبيعي</span>
+                                        <span>عالية</span>
+                                    </div>
+                                    <input type="range" id="pitchControl" min="0.5" max="2" step="0.1" value="1">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="card">
-                    <h2>المعلومات</h2>
-                    <p>هذا الموقع يعمل بالكامل داخل المتصفح دون الحاجة لاتصال بالإنترنت بعد التحميل.</p>
-                    <p>جميع عمليات معالجة الصوت تتم محلياً على جهازك.</p>
-                    <p>يمكنك استخدام الموقع لتسجيل وتعديل الصوت ثم تحميل النتيجة.</p>
+                    <div class="card-header">
+                        <i class="fas fa-magic"></i>
+                        <h2>تأثيرات تغيير الصوت</h2>
+                    </div>
+                    
+                    <div class="voice-effects">
+                        <div class="voice-effect" data-effect="normal">
+                            <i class="fas fa-user"></i>
+                            <h4>طبيعي</h4>
+                        </div>
+                        <div class="voice-effect" data-effect="child">
+                            <i class="fas fa-child"></i>
+                            <h4>صوت طفل</h4>
+                        </div>
+                        <div class="voice-effect" data-effect="female">
+                            <i class="fas fa-female"></i>
+                            <h4>صوت بنت</h4>
+                        </div>
+                        <div class="voice-effect" data-effect="male">
+                            <i class="fas fa-male"></i>
+                            <h4>صوت رجل</h4>
+                        </div>
+                        <div class="voice-effect" data-effect="oldman">
+                            <i class="fas fa-blind"></i>
+                            <h4>رجل عجوز</h4>
+                        </div>
+                        <div class="voice-effect" data-effect="robot">
+                            <i class="fas fa-robot"></i>
+                            <h4>صوت روبوت</h4>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         
         <footer>
-            <p>تم التطوير باستخدام Web Audio API - جميع الحقوق محفوظة &copy; 2023</p>
+            <p>تم التطوير باستخدام Web Audio API - جميع الحقوق محفوظة &copy; 2023 استوديو الصوت</p>
         </footer>
     </div>
 
@@ -355,10 +647,11 @@
         const startTimeInput = document.getElementById('startTime');
         const endTimeInput = document.getElementById('endTime');
         const applyTrimBtn = document.getElementById('applyTrim');
-        const effectSelect = document.getElementById('effectSelect');
-        const applyEffectBtn = document.getElementById('applyEffect');
         const playbackRate = document.getElementById('playbackRate');
         const playbackRateValue = document.getElementById('playbackRateValue');
+        const pitchControl = document.getElementById('pitchControl');
+        const pitchValue = document.getElementById('pitchValue');
+        const voiceEffects = document.querySelectorAll('.voice-effect');
         
         // متغيرات لتخزين البيانات
         let audioContext;
@@ -370,6 +663,7 @@
         let audioBlob;
         let audioBuffer;
         let sourceNode;
+        let currentEffect = 'normal';
         
         // تهيئة العناصر عند تحميل الصفحة
         window.addEventListener('load', init);
@@ -381,13 +675,16 @@
                 setupVisualizer();
             } catch (e) {
                 console.error('Web Audio API غير مدعوم في هذا المتصفح', e);
-                recordStatus.textContent = 'Web Audio API غير مدعوم في هذا المتصفح';
-                recordStatus.classList.remove('hidden');
-                recordStatus.classList.add('status', 'processing');
+                showStatus('Web Audio API غير مدعوم في هذا المتصفح', 'processing');
             }
             
             // إعداد مستمعي الأحداث
             setupEventListeners();
+            
+            // تحديث القيم الأولية
+            updateVolume();
+            updatePlaybackRate();
+            updatePitch();
         }
         
         function setupEventListeners() {
@@ -401,8 +698,21 @@
             // أحداث أدوات التعديل
             volumeControl.addEventListener('input', updateVolume);
             applyTrimBtn.addEventListener('click', applyTrim);
-            applyEffectBtn.addEventListener('click', applyEffect);
             playbackRate.addEventListener('input', updatePlaybackRate);
+            pitchControl.addEventListener('input', updatePitch);
+            
+            // أحداث تأثيرات الصوت
+            voiceEffects.forEach(effect => {
+                effect.addEventListener('click', function() {
+                    // إزالة النشاط من جميع التأثيرات
+                    voiceEffects.forEach(e => e.classList.remove('active'));
+                    // إضافة النشاط للتأثير المحدد
+                    this.classList.add('active');
+                    // تطبيق التأثير
+                    currentEffect = this.getAttribute('data-effect');
+                    applyVoiceEffect();
+                });
+            });
             
             // حدث تحميل الصوت
             downloadBtn.addEventListener('click', downloadAudio);
@@ -416,12 +726,16 @@
             const bufferLength = analyser.frequencyBinCount;
             const dataArray = new Uint8Array(bufferLength);
             
+            // ضبط أبعاد canvas
+            visualizerCanvas.width = visualizerCanvas.offsetWidth;
+            visualizerCanvas.height = visualizerCanvas.offsetHeight;
+            
             function draw() {
                 requestAnimationFrame(draw);
                 
                 analyser.getByteFrequencyData(dataArray);
                 
-                canvasContext.fillStyle = 'rgb(240, 240, 240)';
+                canvasContext.fillStyle = 'rgba(5, 7, 17, 0.1)';
                 canvasContext.fillRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
                 
                 const barWidth = (visualizerCanvas.width / bufferLength) * 2.5;
@@ -431,7 +745,13 @@
                 for(let i = 0; i < bufferLength; i++) {
                     barHeight = dataArray[i] / 2;
                     
-                    canvasContext.fillStyle = `rgb(${barHeight + 100}, 50, 50)`;
+                    // تدرج لوني حسب شدة الصوت
+                    const gradient = canvasContext.createLinearGradient(0, visualizerCanvas.height - barHeight, 0, visualizerCanvas.height);
+                    gradient.addColorStop(0, '#00d4ff');
+                    gradient.addColorStop(0.7, '#ff2a6d');
+                    gradient.addColorStop(1, '#05d9e8');
+                    
+                    canvasContext.fillStyle = gradient;
                     canvasContext.fillRect(x, visualizerCanvas.height - barHeight, barWidth, barHeight);
                     
                     x += barWidth + 1;
@@ -472,9 +792,7 @@
                     downloadBtn.disabled = false;
                     
                     // تحديث الحالة
-                    recordStatus.textContent = 'تم التسجيل بنجاح!';
-                    recordStatus.classList.remove('recording', 'processing');
-                    recordStatus.classList.add('success');
+                    showStatus('تم التسجيل بنجاح!', 'success');
                 };
                 
                 // إعداد التحليل البصري
@@ -490,15 +808,11 @@
                 startRecordBtn.disabled = true;
                 stopRecordBtn.disabled = false;
                 
-                recordStatus.textContent = 'جاري التسجيل...';
-                recordStatus.classList.remove('hidden', 'success', 'processing');
-                recordStatus.classList.add('recording');
+                showStatus('جاري التسجيل...', 'recording');
                 
             } catch (error) {
                 console.error('خطأ في الوصول إلى الميكروفون:', error);
-                recordStatus.textContent = 'خطأ في الوصول إلى الميكروفون. يرجى التحقق من الأذونات.';
-                recordStatus.classList.remove('hidden', 'recording', 'success');
-                recordStatus.classList.add('processing');
+                showStatus('خطأ في الوصول إلى الميكروفون. يرجى التحقق من الأذونات.', 'processing');
             }
         }
         
@@ -513,9 +827,7 @@
                 startRecordBtn.disabled = false;
                 stopRecordBtn.disabled = true;
                 
-                recordStatus.textContent = 'جاري معالجة الصوت...';
-                recordStatus.classList.remove('recording');
-                recordStatus.classList.add('processing');
+                showStatus('جاري معالجة الصوت...', 'processing');
             }
         }
         
@@ -537,9 +849,7 @@
                     downloadBtn.disabled = false;
                     
                     // تحديث الحالة
-                    recordStatus.textContent = 'تم تحميل الملف بنجاح!';
-                    recordStatus.classList.remove('hidden', 'recording', 'processing');
-                    recordStatus.classList.add('success');
+                    showStatus('تم تحميل الملف بنجاح!', 'success');
                 });
             };
             
@@ -563,6 +873,16 @@
             const rate = playbackRate.value;
             playbackRateValue.textContent = `${rate}x`;
             audioPlayer.playbackRate = rate;
+        }
+        
+        function updatePitch() {
+            const pitch = pitchControl.value;
+            let pitchText = 'طبيعي';
+            
+            if (pitch < 0.9) pitchText = 'منخفضة';
+            else if (pitch > 1.1) pitchText = 'عالية';
+            
+            pitchValue.textContent = pitchText;
         }
         
         function applyTrim() {
@@ -617,65 +937,53 @@
             // تحديث مدخلات المدة
             updateDurationInputs(audioBuffer.duration);
             
-            recordStatus.textContent = 'تم قص الصوت بنجاح!';
-            recordStatus.classList.remove('hidden', 'recording', 'processing');
-            recordStatus.classList.add('success');
+            showStatus('تم قص الصوت بنجاح!', 'success');
         }
         
-        function applyEffect() {
+        function applyVoiceEffect() {
             if (!audioBuffer) {
                 alert('يرجى تسجيل أو تحميل ملف صوتي أولاً');
                 return;
             }
             
-            const effectType = effectSelect.value;
+            let processedBuffer = audioBuffer;
             
-            if (effectType === 'none') {
-                // إعادة الصوت الأصلي
-                const wavBlob = bufferToWave(audioBuffer, audioBuffer.length);
-                const audioUrl = URL.createObjectURL(wavBlob);
-                audioPlayer.src = audioUrl;
-                return;
-            }
-            
-            // تطبيق التأثير المطلوب
-            let processedBuffer;
-            
-            switch(effectType) {
-                case 'echo':
-                    processedBuffer = applyEcho(audioBuffer);
+            // تطبيق التأثيرات حسب النوع المحدد
+            switch(currentEffect) {
+                case 'child':
+                    processedBuffer = applyChildEffect(audioBuffer);
                     break;
-                case 'reverb':
-                    processedBuffer = applyReverb(audioBuffer);
+                case 'female':
+                    processedBuffer = applyFemaleEffect(audioBuffer);
                     break;
-                case 'distortion':
-                    processedBuffer = applyDistortion(audioBuffer);
+                case 'male':
+                    processedBuffer = applyMaleEffect(audioBuffer);
                     break;
+                case 'oldman':
+                    processedBuffer = applyOldManEffect(audioBuffer);
+                    break;
+                case 'robot':
+                    processedBuffer = applyRobotEffect(audioBuffer);
+                    break;
+                case 'normal':
                 default:
-                    processedBuffer = audioBuffer;
+                    // لا تغيير - الصوت الطبيعي
+                    break;
             }
-            
-            // تحديث audioBuffer
-            audioBuffer = processedBuffer;
             
             // إنشاء Blob جديد وتحديث المشغل
-            const wavBlob = bufferToWave(audioBuffer, audioBuffer.length);
+            const wavBlob = bufferToWave(processedBuffer, processedBuffer.length);
             const audioUrl = URL.createObjectURL(wavBlob);
             audioPlayer.src = audioUrl;
             
-            recordStatus.textContent = `تم تطبيق تأثير ${effectType} بنجاح!`;
-            recordStatus.classList.remove('hidden', 'recording', 'processing');
-            recordStatus.classList.add('success');
+            showStatus(`تم تطبيق تأثير ${currentEffect} بنجاح!`, 'success');
         }
         
-        function applyEcho(buffer) {
-            const echoDelay = 0.2; // تأخير 200 مللي ثانية
-            const echoDecay = 0.5; // تضاؤل بنسبة 50%
-            const echoCount = 3; // عدد مرات التكرار
-            
+        function applyChildEffect(buffer) {
+            // لصوت الطفل: زيادة السرعة والطبقة
             const newBuffer = audioContext.createBuffer(
                 buffer.numberOfChannels,
-                buffer.length + Math.floor(echoDelay * echoCount * buffer.sampleRate),
+                buffer.length,
                 buffer.sampleRate
             );
             
@@ -683,20 +991,13 @@
                 const originalData = buffer.getChannelData(channel);
                 const newData = newBuffer.getChannelData(channel);
                 
-                // نسخ البيانات الأصلية
                 for (let i = 0; i < originalData.length; i++) {
-                    newData[i] = originalData[i];
-                }
-                
-                // إضافة التكرارات
-                for (let echo = 1; echo <= echoCount; echo++) {
-                    const delaySamples = Math.floor(echoDelay * echo * buffer.sampleRate);
-                    const decay = Math.pow(echoDecay, echo);
-                    
-                    for (let i = 0; i < originalData.length; i++) {
-                        if (i + delaySamples < newData.length) {
-                            newData[i + delaySamples] += originalData[i] * decay;
-                        }
+                    // زيادة السرعة والطبقة
+                    let index = Math.floor(i * 1.3);
+                    if (index < originalData.length) {
+                        newData[i] = originalData[index] * 1.2;
+                    } else {
+                        newData[i] = 0;
                     }
                 }
             }
@@ -704,8 +1005,8 @@
             return newBuffer;
         }
         
-        function applyReverb(buffer) {
-            // تطبيق صدى بسيط (محاكاة للصدي)
+        function applyFemaleEffect(buffer) {
+            // لصوت الأنثى: زيادة الطبقة قليلاً
             const newBuffer = audioContext.createBuffer(
                 buffer.numberOfChannels,
                 buffer.length,
@@ -716,24 +1017,22 @@
                 const originalData = buffer.getChannelData(channel);
                 const newData = newBuffer.getChannelData(channel);
                 
-                // نسخ البيانات الأصلية
                 for (let i = 0; i < originalData.length; i++) {
-                    newData[i] = originalData[i];
-                }
-                
-                // إضافة صدى بسيط
-                const delay = Math.floor(0.03 * buffer.sampleRate); // 30ms delay
-                const decay = 0.7;
-                
-                for (let i = delay; i < originalData.length; i++) {
-                    newData[i] += originalData[i - delay] * decay;
+                    // زيادة الطبقة
+                    let index = Math.floor(i * 1.15);
+                    if (index < originalData.length) {
+                        newData[i] = originalData[index];
+                    } else {
+                        newData[i] = 0;
+                    }
                 }
             }
             
             return newBuffer;
         }
         
-        function applyDistortion(buffer) {
+        function applyMaleEffect(buffer) {
+            // لصوت الرجل: خفض الطبقة قليلاً
             const newBuffer = audioContext.createBuffer(
                 buffer.numberOfChannels,
                 buffer.length,
@@ -744,12 +1043,75 @@
                 const originalData = buffer.getChannelData(channel);
                 const newData = newBuffer.getChannelData(channel);
                 
-                // تطبيق تشويه بسيط
                 for (let i = 0; i < originalData.length; i++) {
-                    // تشويه باستخدام دالة القطع
-                    let sample = originalData[i] * 2; // تكبير الإشارة
-                    if (sample > 1) sample = 1;
-                    if (sample < -1) sample = -1;
+                    // خفض الطبقة
+                    let index = Math.floor(i * 0.9);
+                    if (index < originalData.length) {
+                        newData[i] = originalData[index];
+                    } else {
+                        newData[i] = 0;
+                    }
+                }
+            }
+            
+            return newBuffer;
+        }
+        
+        function applyOldManEffect(buffer) {
+            // لصوت الرجل العجوز: خفض الطبقة وإضافة خشونة
+            const newBuffer = audioContext.createBuffer(
+                buffer.numberOfChannels,
+                buffer.length,
+                buffer.sampleRate
+            );
+            
+            for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+                const originalData = buffer.getChannelData(channel);
+                const newData = newBuffer.getChannelData(channel);
+                
+                for (let i = 0; i < originalData.length; i++) {
+                    // خفض الطبقة
+                    let index = Math.floor(i * 0.85);
+                    let sample = 0;
+                    if (index < originalData.length) {
+                        sample = originalData[index];
+                    }
+                    
+                    // إضافة خشونة (تشويه خفيف)
+                    if (Math.random() > 0.97) {
+                        sample *= (0.7 + Math.random() * 0.6);
+                    }
+                    
+                    newData[i] = sample;
+                }
+            }
+            
+            return newBuffer;
+        }
+        
+        function applyRobotEffect(buffer) {
+            // لصوت الروبوت: إضافة تشديد وتكرار
+            const newBuffer = audioContext.createBuffer(
+                buffer.numberOfChannels,
+                buffer.length,
+                buffer.sampleRate
+            );
+            
+            for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+                const originalData = buffer.getChannelData(channel);
+                const newData = newBuffer.getChannelData(channel);
+                
+                for (let i = 0; i < originalData.length; i++) {
+                    let sample = originalData[i];
+                    
+                    // إضافة تشديد روبوتي
+                    sample = Math.sign(sample) * Math.min(Math.abs(sample) * 1.5, 0.8);
+                    
+                    // إضافة تكرار بسيط
+                    if (i > 1000) {
+                        sample += originalData[i - 1000] * 0.3;
+                    }
+                    
                     newData[i] = sample;
                 }
             }
@@ -772,6 +1134,22 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+        }
+        
+        function showStatus(message, type) {
+            recordStatus.textContent = message;
+            recordStatus.className = 'status';
+            recordStatus.classList.add(type);
+            
+            if (type === 'recording') {
+                recordStatus.innerHTML = `<div class="pulse"></div><span>${message}</span>`;
+            } else {
+                const icon = type === 'success' ? 'fa-check-circle' : 
+                            type === 'processing' ? 'fa-sync-alt' : 'fa-info-circle';
+                recordStatus.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+            }
+            
+            recordStatus.classList.remove('hidden');
         }
         
         // دالة لتحويل AudioBuffer إلى Blob بصيغة WAV
