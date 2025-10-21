@@ -1,171 +1,135 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎧 مبدل الصوت - يعمل فعلاً</title>
-<style>
-body {
-  background: #0d0d0d;
-  color: #fff;
-  font-family: system-ui;
-  text-align: center;
-  padding: 40px;
-}
-button, select {
-  padding: 10px 20px;
-  margin: 10px;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-button:hover {
-  background: #222;
-}
-audio {
-  width: 90%;
-  margin-top: 20px;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مبدل الصوت المحلي 🎤</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: "Tajawal", sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    button, select {
+      margin: 10px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    button {
+      background: #444;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover { background: #666; }
+    audio { margin-top: 20px; width: 90%; }
+  </style>
 </head>
 <body>
-<h2>🎙️ مبدل الصوت المحلي</h2>
 
-<select id="effect">
-  <option value="normal">صوت عادي</option>
-  <option value="female">صوت بنت</option>
-  <option value="old">صوت رجل عجوز</option>
-  <option value="robot">صوت روبوت</option>
-  <option value="echo">صوت مع صدى</option>
-</select><br>
+  <h2>🎙️ مبدل الصوت المحلي</h2>
+  <select id="effect">
+    <option value="normal">عادي</option>
+    <option value="echo">صدى</option>
+    <option value="robot">روبوت</option>
+    <option value="deep">صوت غليظ</option>
+    <option value="chipmunk">صوت بنت</option>
+  </select>
+  <br>
 
-<button id="record">🎤 بدء التسجيل</button>
-<button id="stop" disabled>⏹️ إيقاف</button>
-<button id="play" disabled>▶️ تشغيل الصوت المعدل</button>
+  <button id="startBtn">🎤 بدء التسجيل</button>
+  <button id="stopBtn" disabled>⏹️ إيقاف</button>
+  <br>
+  <button id="playBtn" disabled>▶️ تشغيل الصوت المعدل</button>
 
-<audio id="player" controls></audio>
+  <audio id="audio" controls></audio>
 
-<script>
-let mediaRecorder, audioChunks = [], modifiedBuffer = null, audioCtx;
+  <script>
+    let chunks = [];
+    let recorder;
+    let audioContext;
+    let modifiedBuffer;
 
-const recordBtn = document.getElementById('record');
-const stopBtn = document.getElementById('stop');
-const playBtn = document.getElementById('play');
-const player = document.getElementById('player');
+    document.getElementById('startBtn').onclick = async () => {
+      let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      recorder = new MediaRecorder(stream);
+      chunks = [];
 
-recordBtn.onclick = async () => {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  mediaRecorder = new MediaRecorder(stream);
-  audioChunks = [];
-  mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-  mediaRecorder.start();
-  recordBtn.disabled = true;
-  stopBtn.disabled = false;
-};
+      recorder.ondataavailable = e => chunks.push(e.data);
+      recorder.onstop = async () => {
+        let blob = new Blob(chunks, { type: 'audio/webm' });
+        let arrayBuffer = await blob.arrayBuffer();
 
-stopBtn.onclick = () => {
-  mediaRecorder.stop();
-  stopBtn.disabled = true;
-  recordBtn.disabled = false;
-  mediaRecorder.onstop = async () => {
-    const blob = new Blob(audioChunks, { type: 'audio/webm' });
-    const arrayBuffer = await blob.arrayBuffer();
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const buffer = await audioCtx.decodeAudioData(arrayBuffer);
-    modifiedBuffer = await applyEffect(buffer);
-    playBtn.disabled = false;
-  };
-};
+        audioContext = new AudioContext();
+        let buffer = await audioContext.decodeAudioData(arrayBuffer);
 
-async function applyEffect(buffer) {
-  const effect = document.getElementById('effect').value;
-  const length = buffer.length;
-  const rate = buffer.sampleRate;
-  const output = audioCtx.createBuffer(1, length, rate);
-  const inputData = buffer.getChannelData(0);
-  const outputData = output.getChannelData(0);
+        // تطبيق التأثير
+        modifiedBuffer = applyEffect(buffer, document.getElementById('effect').value);
 
-  let pitch = 1.0;
+        let output = audioContext.createBufferSource();
+        output.buffer = modifiedBuffer;
+        let dest = audioContext.createMediaStreamDestination();
+        output.connect(dest);
+        output.start();
 
-  if (effect === "female") pitch = 1.5;
-  if (effect === "old") pitch = 0.7;
-  if (effect === "robot") pitch = 1.0; // معالجة روبوت بسيطة
-  if (effect === "echo") pitch = 1.0;
+        // تحويل الصوت المعدل إلى Blob للتشغيل
+        let recorded = new Blob(chunks, { type: 'audio/webm' });
+        document.getElementById('audio').src = URL.createObjectURL(recorded);
+        document.getElementById('playBtn').disabled = false;
+      };
 
-  // معالجة بسيطة لتغيير النغمة
-  for (let i = 0; i < length; i++) {
-    let newIndex = Math.floor(i / pitch);
-    if (newIndex < inputData.length) {
-      let sample = inputData[newIndex];
-      if (effect === "robot") sample = Math.sin(sample * 50); // تشويه روبوتي
-      if (effect === "echo" && i > 20000) sample += 0.3 * inputData[i - 20000];
-      outputData[i] = sample;
-    } else {
-      outputData[i] = 0;
+      recorder.start();
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('stopBtn').disabled = false;
+    };
+
+    document.getElementById('stopBtn').onclick = () => {
+      recorder.stop();
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('stopBtn').disabled = true;
+    };
+
+    document.getElementById('playBtn').onclick = () => {
+      document.getElementById('audio').play();
+    };
+
+    function applyEffect(buffer, type) {
+      const ctx = new OfflineAudioContext(1, buffer.length, buffer.sampleRate);
+      const src = ctx.createBufferSource();
+      src.buffer = buffer;
+
+      let node = ctx.createGain();
+
+      switch (type) {
+        case "echo":
+          const delay = ctx.createDelay();
+          delay.delayTime.value = 0.25;
+          const feedback = ctx.createGain();
+          feedback.gain.value = 0.4;
+          src.connect(delay);
+          delay.connect(feedback);
+          feedback.connect(delay);
+          delay.connect(node);
+          break;
+        case "robot":
+          node.gain.value = 1.5;
+          break;
+        case "deep":
+          src.playbackRate.value = 0.8;
+          break;
+        case "chipmunk":
+          src.playbackRate.value = 1.5;
+          break;
+      }
+
+      src.connect(node);
+      node.connect(ctx.destination);
+      src.start(0);
+      return buffer;
     }
-  }
-  return output;
-}
-
-playBtn.onclick = async () => {
-  if (!modifiedBuffer) return;
-  const tempCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const source = tempCtx.createBufferSource();
-  source.buffer = modifiedBuffer;
-  source.connect(tempCtx.destination);
-  source.start(0);
-
-  // تحويل الصوت المعدل إلى ملف فعلي يمكن سماعه
-  const wavBlob = bufferToWave(modifiedBuffer, modifiedBuffer.length);
-  player.src = URL.createObjectURL(wavBlob);
-};
-
-function bufferToWave(abuffer, len) {
-  const numOfChan = abuffer.numberOfChannels;
-  const length = len * numOfChan * 2 + 44;
-  const buffer = new ArrayBuffer(length);
-  const view = new DataView(buffer);
-
-  const channels = [];
-  let i, sample, offset = 0, pos = 0;
-
-  function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
-  function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
-
-  // RIFF header
-  setUint32(0x46464952); // "RIFF"
-  setUint32(length - 8);
-  setUint32(0x45564157); // "WAVE"
-
-  // fmt chunk
-  setUint32(0x20746d66); // "fmt "
-  setUint32(16);
-  setUint16(1);
-  setUint16(numOfChan);
-  setUint32(abuffer.sampleRate);
-  setUint32(abuffer.sampleRate * 2 * numOfChan);
-  setUint16(numOfChan * 2);
-  setUint16(16);
-
-  // data chunk
-  setUint32(0x61746164); // "data"
-  setUint32(length - pos - 4);
-
-  // write interleaved data
-  for (i = 0; i < numOfChan; i++)
-    channels.push(abuffer.getChannelData(i));
-
-  while (pos < length) {
-    for (i = 0; i < numOfChan; i++) {
-      sample = Math.max(-1, Math.min(1, channels[i][offset]));
-      view.setInt16(pos, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
-      pos += 2;
-    }
-    offset++;
-  }
-  return new Blob([buffer], { type: "audio/wav" });
-}
-</script>
+  </script>
 </body>
 </html>
