@@ -1,139 +1,835 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎧 محرر الصوت الذكي</title>
-<style>
-  body {
-    background: #0d0d0d;
-    color: #fff;
-    font-family: "Tajawal", sans-serif;
-    text-align: center;
-    padding: 25px;
-  }
-  h2 { color: #00d1ff; }
-  button {
-    background: #1f1f1f;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 20px;
-    margin: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-  button:hover { background: #333; }
-  input[type="range"] {
-    width: 80%;
-    accent-color: #00d1ff;
-  }
-  .control {
-    background: #1a1a1a;
-    padding: 15px;
-    border-radius: 12px;
-    margin: 10px auto;
-    width: 90%;
-    max-width: 400px;
-  }
-  label { display: block; margin-bottom: 5px; color: #ccc; }
-  audio { margin-top: 20px; width: 90%; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع تسجيل وتعديل الصوت</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b8cbc;
+            --accent-color: #ff6b6b;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .recorder-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-danger {
+            background-color: var(--accent-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #ff5252;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .visualizer {
+            width: 100%;
+            height: 150px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .audio-player {
+            width: 100%;
+            margin: 1rem 0;
+        }
+        
+        .tools {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .tool {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .tool h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+        
+        .tool-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+        }
+        
+        .file-upload {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .file-input {
+            padding: 0.8rem;
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-input:hover {
+            border-color: var(--primary-color);
+            background-color: #f0f7ff;
+        }
+        
+        .status {
+            padding: 0.8rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .status.recording {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status.processing {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <header>
+            <h1>موقع تسجيل وتعديل الصوت</h1>
+            <p class="subtitle">سجل صوتك وقم بتعديله باستخدام الأدوات المتاحة</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="left-column">
+                <div class="card">
+                    <h2>تسجيل الصوت</h2>
+                    <div class="visualizer">
+                        <canvas id="visualizer"></canvas>
+                    </div>
+                    <div class="recorder-controls">
+                        <button id="startRecord">
+                            <span>بدء التسجيل</span>
+                        </button>
+                        <button id="stopRecord" disabled>
+                            <span>إيقاف التسجيل</span>
+                        </button>
+                    </div>
+                    <div id="recordStatus" class="status hidden"></div>
+                    
+                    <div class="file-upload">
+                        <label for="audioUpload" class="file-input">
+                            أو قم برفع ملف صوتي
+                        </label>
+                        <input type="file" id="audioUpload" accept="audio/*" class="hidden">
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2>استمع إلى التسجيل</h2>
+                    <audio id="audioPlayer" controls class="audio-player"></audio>
+                    <div class="recorder-controls">
+                        <button id="downloadAudio" disabled>
+                            <span>تحميل الصوت</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-column">
+                <div class="card">
+                    <h2>أدوات تعديل الصوت</h2>
+                    <div class="tools">
+                        <div class="tool">
+                            <h3>مستوى الصوت</h3>
+                            <div class="tool-controls">
+                                <input type="range" id="volumeControl" min="0" max="2" step="0.1" value="1">
+                                <span id="volumeValue">100%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="tool">
+                            <h3>قص الصوت</h3>
+                            <div class="tool-controls">
+                                <label for="startTime">بداية القص (ثانية):</label>
+                                <input type="number" id="startTime" min="0" value="0" step="0.1">
+                                <label for="endTime">نهاية القص (ثانية):</label>
+                                <input type="number" id="endTime" min="0" value="0" step="0.1">
+                                <button id="applyTrim" class="btn-success">تطبيق القص</button>
+                            </div>
+                        </div>
+                        
+                        <div class="tool">
+                            <h3>تأثيرات الصوت</h3>
+                            <div class="tool-controls">
+                                <select id="effectSelect">
+                                    <option value="none">بدون تأثير</option>
+                                    <option value="echo">صدى</option>
+                                    <option value="reverb">صدي</option>
+                                    <option value="distortion">تشويه</option>
+                                </select>
+                                <button id="applyEffect" class="btn-success">تطبيق التأثير</button>
+                            </div>
+                        </div>
+                        
+                        <div class="tool">
+                            <h3>سرعة التشغيل</h3>
+                            <div class="tool-controls">
+                                <input type="range" id="playbackRate" min="0.5" max="2" step="0.1" value="1">
+                                <span id="playbackRateValue">1x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2>المعلومات</h2>
+                    <p>هذا الموقع يعمل بالكامل داخل المتصفح دون الحاجة لاتصال بالإنترنت بعد التحميل.</p>
+                    <p>جميع عمليات معالجة الصوت تتم محلياً على جهازك.</p>
+                    <p>يمكنك استخدام الموقع لتسجيل وتعديل الصوت ثم تحميل النتيجة.</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>تم التطوير باستخدام Web Audio API - جميع الحقوق محفوظة &copy; 2023</p>
+        </footer>
+    </div>
 
-<h2>🎙️ مبدل الصوت الاحترافي</h2>
-
-<div>
-  <button id="startBtn">🎤 بدء التسجيل</button>
-  <button id="stopBtn" disabled>⏹️ إيقاف</button>
-  <button id="playBtn" disabled>▶️ تشغيل الصوت المعدل</button>
-</div>
-
-<!-- عناصر التحكم -->
-<div class="control">
-  <label>🔊 مستوى الصوت: <span id="volumeVal">1</span></label>
-  <input type="range" id="volume" min="0" max="2" step="0.1" value="1">
-</div>
-
-<div class="control">
-  <label>🎚️ نغمة الصوت (Pitch): <span id="pitchVal">1</span></label>
-  <input type="range" id="pitch" min="0.5" max="2" step="0.1" value="1">
-</div>
-
-<div class="control">
-  <label>⏩ سرعة التشغيل: <span id="speedVal">1</span></label>
-  <input type="range" id="speed" min="0.5" max="2" step="0.1" value="1">
-</div>
-
-<div class="control">
-  <label>🌊 الصدى (Echo): <span id="echoVal">0</span></label>
-  <input type="range" id="echo" min="0" max="0.8" step="0.05" value="0">
-</div>
-
-<audio id="audio" controls></audio>
-
-<script>
-let chunks = [];
-let recorder;
-let audioContext;
-let recordedBuffer;
-
-document.getElementById('startBtn').onclick = async () => {
-  let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  recorder = new MediaRecorder(stream);
-  chunks = [];
-  recorder.ondataavailable = e => chunks.push(e.data);
-  recorder.onstop = async () => {
-    let blob = new Blob(chunks, { type: 'audio/webm' });
-    let arrayBuffer = await blob.arrayBuffer();
-    audioContext = new AudioContext();
-    recordedBuffer = await audioContext.decodeAudioData(arrayBuffer);
-    document.getElementById('playBtn').disabled = false;
-  };
-  recorder.start();
-  document.getElementById('startBtn').disabled = true;
-  document.getElementById('stopBtn').disabled = false;
-};
-
-document.getElementById('stopBtn').onclick = () => {
-  recorder.stop();
-  document.getElementById('startBtn').disabled = false;
-  document.getElementById('stopBtn').disabled = true;
-};
-
-document.getElementById('playBtn').onclick = () => {
-  if (!recordedBuffer) return;
-  const ctx = new AudioContext();
-  const src = ctx.createBufferSource();
-  src.buffer = recordedBuffer;
-
-  // إعداد الفلاتر حسب القيم
-  const gainNode = ctx.createGain();
-  gainNode.gain.value = parseFloat(document.getElementById('volume').value);
-
-  const delayNode = ctx.createDelay();
-  delayNode.delayTime.value = parseFloat(document.getElementById('echo').value);
-
-  src.playbackRate.value = parseFloat(document.getElementById('speed').value);
-
-  // Pitch adjustment (تغيير النغمة)
-  const pitch = parseFloat(document.getElementById('pitch').value);
-  src.playbackRate.value *= pitch;
-
-  src.connect(gainNode);
-  gainNode.connect(delayNode);
-  delayNode.connect(ctx.destination);
-  src.start();
-
-  // عرض التحديثات اللحظية
-  document.getElementById('volumeVal').textContent = gainNode.gain.value;
-  document.getElementById('pitchVal').textContent = pitch;
-  document.getElementById('speedVal').textContent = document.getElementById('speed').value;
-  document.getElementById('echoVal').textContent = document.getElementById('echo').value;
-};
-</script>
-
+    <script>
+        // العناصر الرئيسية في الواجهة
+        const startRecordBtn = document.getElementById('startRecord');
+        const stopRecordBtn = document.getElementById('stopRecord');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const downloadBtn = document.getElementById('downloadAudio');
+        const audioUpload = document.getElementById('audioUpload');
+        const visualizerCanvas = document.getElementById('visualizer');
+        const recordStatus = document.getElementById('recordStatus');
+        
+        // عناصر أدوات التعديل
+        const volumeControl = document.getElementById('volumeControl');
+        const volumeValue = document.getElementById('volumeValue');
+        const startTimeInput = document.getElementById('startTime');
+        const endTimeInput = document.getElementById('endTime');
+        const applyTrimBtn = document.getElementById('applyTrim');
+        const effectSelect = document.getElementById('effectSelect');
+        const applyEffectBtn = document.getElementById('applyEffect');
+        const playbackRate = document.getElementById('playbackRate');
+        const playbackRateValue = document.getElementById('playbackRateValue');
+        
+        // متغيرات لتخزين البيانات
+        let audioContext;
+        let analyser;
+        let microphone;
+        let audioStream;
+        let recorder;
+        let audioChunks = [];
+        let audioBlob;
+        let audioBuffer;
+        let sourceNode;
+        
+        // تهيئة العناصر عند تحميل الصفحة
+        window.addEventListener('load', init);
+        
+        function init() {
+            // تهيئة Audio Context
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                setupVisualizer();
+            } catch (e) {
+                console.error('Web Audio API غير مدعوم في هذا المتصفح', e);
+                recordStatus.textContent = 'Web Audio API غير مدعوم في هذا المتصفح';
+                recordStatus.classList.remove('hidden');
+                recordStatus.classList.add('status', 'processing');
+            }
+            
+            // إعداد مستمعي الأحداث
+            setupEventListeners();
+        }
+        
+        function setupEventListeners() {
+            // أحداث التسجيل
+            startRecordBtn.addEventListener('click', startRecording);
+            stopRecordBtn.addEventListener('click', stopRecording);
+            
+            // أحداث رفع الملف
+            audioUpload.addEventListener('change', handleAudioUpload);
+            
+            // أحداث أدوات التعديل
+            volumeControl.addEventListener('input', updateVolume);
+            applyTrimBtn.addEventListener('click', applyTrim);
+            applyEffectBtn.addEventListener('click', applyEffect);
+            playbackRate.addEventListener('input', updatePlaybackRate);
+            
+            // حدث تحميل الصوت
+            downloadBtn.addEventListener('click', downloadAudio);
+        }
+        
+        function setupVisualizer() {
+            const canvasContext = visualizerCanvas.getContext('2d');
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            function draw() {
+                requestAnimationFrame(draw);
+                
+                analyser.getByteFrequencyData(dataArray);
+                
+                canvasContext.fillStyle = 'rgb(240, 240, 240)';
+                canvasContext.fillRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
+                
+                const barWidth = (visualizerCanvas.width / bufferLength) * 2.5;
+                let barHeight;
+                let x = 0;
+                
+                for(let i = 0; i < bufferLength; i++) {
+                    barHeight = dataArray[i] / 2;
+                    
+                    canvasContext.fillStyle = `rgb(${barHeight + 100}, 50, 50)`;
+                    canvasContext.fillRect(x, visualizerCanvas.height - barHeight, barWidth, barHeight);
+                    
+                    x += barWidth + 1;
+                }
+            }
+            
+            draw();
+        }
+        
+        async function startRecording() {
+            try {
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                // إعداد المسجل
+                recorder = new MediaRecorder(audioStream);
+                audioChunks = [];
+                
+                recorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+                
+                recorder.onstop = () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    audioPlayer.src = audioUrl;
+                    
+                    // تحويل Blob إلى AudioBuffer للمعالجة
+                    const fileReader = new FileReader();
+                    fileReader.onload = function() {
+                        audioContext.decodeAudioData(this.result, (buffer) => {
+                            audioBuffer = buffer;
+                            updateDurationInputs(buffer.duration);
+                        });
+                    };
+                    fileReader.readAsArrayBuffer(audioBlob);
+                    
+                    // تمكين زر التحميل
+                    downloadBtn.disabled = false;
+                    
+                    // تحديث الحالة
+                    recordStatus.textContent = 'تم التسجيل بنجاح!';
+                    recordStatus.classList.remove('recording', 'processing');
+                    recordStatus.classList.add('success');
+                };
+                
+                // إعداد التحليل البصري
+                if (audioContext && analyser) {
+                    microphone = audioContext.createMediaStreamSource(audioStream);
+                    microphone.connect(analyser);
+                }
+                
+                // بدء التسجيل
+                recorder.start();
+                
+                // تحديث واجهة المستخدم
+                startRecordBtn.disabled = true;
+                stopRecordBtn.disabled = false;
+                
+                recordStatus.textContent = 'جاري التسجيل...';
+                recordStatus.classList.remove('hidden', 'success', 'processing');
+                recordStatus.classList.add('recording');
+                
+            } catch (error) {
+                console.error('خطأ في الوصول إلى الميكروفون:', error);
+                recordStatus.textContent = 'خطأ في الوصول إلى الميكروفون. يرجى التحقق من الأذونات.';
+                recordStatus.classList.remove('hidden', 'recording', 'success');
+                recordStatus.classList.add('processing');
+            }
+        }
+        
+        function stopRecording() {
+            if (recorder && recorder.state !== 'inactive') {
+                recorder.stop();
+                
+                // إيقاف جميع المسارات الصوتية
+                audioStream.getTracks().forEach(track => track.stop());
+                
+                // تحديث واجهة المستخدم
+                startRecordBtn.disabled = false;
+                stopRecordBtn.disabled = true;
+                
+                recordStatus.textContent = 'جاري معالجة الصوت...';
+                recordStatus.classList.remove('recording');
+                recordStatus.classList.add('processing');
+            }
+        }
+        
+        function handleAudioUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const fileReader = new FileReader();
+            
+            fileReader.onload = function() {
+                const audioUrl = URL.createObjectURL(file);
+                audioPlayer.src = audioUrl;
+                
+                audioContext.decodeAudioData(this.result, (buffer) => {
+                    audioBuffer = buffer;
+                    updateDurationInputs(buffer.duration);
+                    
+                    // تمكين زر التحميل
+                    downloadBtn.disabled = false;
+                    
+                    // تحديث الحالة
+                    recordStatus.textContent = 'تم تحميل الملف بنجاح!';
+                    recordStatus.classList.remove('hidden', 'recording', 'processing');
+                    recordStatus.classList.add('success');
+                });
+            };
+            
+            fileReader.readAsArrayBuffer(file);
+        }
+        
+        function updateDurationInputs(duration) {
+            startTimeInput.value = 0;
+            endTimeInput.value = duration.toFixed(1);
+            startTimeInput.max = duration.toFixed(1);
+            endTimeInput.max = duration.toFixed(1);
+        }
+        
+        function updateVolume() {
+            const volume = volumeControl.value;
+            volumeValue.textContent = `${Math.round(volume * 100)}%`;
+            audioPlayer.volume = volume;
+        }
+        
+        function updatePlaybackRate() {
+            const rate = playbackRate.value;
+            playbackRateValue.textContent = `${rate}x`;
+            audioPlayer.playbackRate = rate;
+        }
+        
+        function applyTrim() {
+            if (!audioBuffer) {
+                alert('يرجى تسجيل أو تحميل ملف صوتي أولاً');
+                return;
+            }
+            
+            const startTime = parseFloat(startTimeInput.value);
+            const endTime = parseFloat(endTimeInput.value);
+            
+            if (startTime >= endTime) {
+                alert('وقت البداية يجب أن يكون أقل من وقت النهاية');
+                return;
+            }
+            
+            if (endTime > audioBuffer.duration) {
+                alert('وقت النهاية لا يمكن أن يكون أكبر من مدة الملف');
+                return;
+            }
+            
+            // حساب عدد العينات المطلوبة
+            const startOffset = Math.floor(startTime * audioBuffer.sampleRate);
+            const endOffset = Math.floor(endTime * audioBuffer.sampleRate);
+            const frameCount = endOffset - startOffset;
+            
+            // إنشاء AudioBuffer جديد
+            const newBuffer = audioContext.createBuffer(
+                audioBuffer.numberOfChannels,
+                frameCount,
+                audioBuffer.sampleRate
+            );
+            
+            // نسخ البيانات المطلوبة
+            for (let channel = 0; channel < audioBuffer.numberOfChannels; channel++) {
+                const channelData = audioBuffer.getChannelData(channel);
+                const newChannelData = newBuffer.getChannelData(channel);
+                
+                for (let i = 0; i < frameCount; i++) {
+                    newChannelData[i] = channelData[i + startOffset];
+                }
+            }
+            
+            // تحديث audioBuffer
+            audioBuffer = newBuffer;
+            
+            // إنشاء Blob جديد وتحديث المشغل
+            const wavBlob = bufferToWave(audioBuffer, audioBuffer.length);
+            const audioUrl = URL.createObjectURL(wavBlob);
+            audioPlayer.src = audioUrl;
+            
+            // تحديث مدخلات المدة
+            updateDurationInputs(audioBuffer.duration);
+            
+            recordStatus.textContent = 'تم قص الصوت بنجاح!';
+            recordStatus.classList.remove('hidden', 'recording', 'processing');
+            recordStatus.classList.add('success');
+        }
+        
+        function applyEffect() {
+            if (!audioBuffer) {
+                alert('يرجى تسجيل أو تحميل ملف صوتي أولاً');
+                return;
+            }
+            
+            const effectType = effectSelect.value;
+            
+            if (effectType === 'none') {
+                // إعادة الصوت الأصلي
+                const wavBlob = bufferToWave(audioBuffer, audioBuffer.length);
+                const audioUrl = URL.createObjectURL(wavBlob);
+                audioPlayer.src = audioUrl;
+                return;
+            }
+            
+            // تطبيق التأثير المطلوب
+            let processedBuffer;
+            
+            switch(effectType) {
+                case 'echo':
+                    processedBuffer = applyEcho(audioBuffer);
+                    break;
+                case 'reverb':
+                    processedBuffer = applyReverb(audioBuffer);
+                    break;
+                case 'distortion':
+                    processedBuffer = applyDistortion(audioBuffer);
+                    break;
+                default:
+                    processedBuffer = audioBuffer;
+            }
+            
+            // تحديث audioBuffer
+            audioBuffer = processedBuffer;
+            
+            // إنشاء Blob جديد وتحديث المشغل
+            const wavBlob = bufferToWave(audioBuffer, audioBuffer.length);
+            const audioUrl = URL.createObjectURL(wavBlob);
+            audioPlayer.src = audioUrl;
+            
+            recordStatus.textContent = `تم تطبيق تأثير ${effectType} بنجاح!`;
+            recordStatus.classList.remove('hidden', 'recording', 'processing');
+            recordStatus.classList.add('success');
+        }
+        
+        function applyEcho(buffer) {
+            const echoDelay = 0.2; // تأخير 200 مللي ثانية
+            const echoDecay = 0.5; // تضاؤل بنسبة 50%
+            const echoCount = 3; // عدد مرات التكرار
+            
+            const newBuffer = audioContext.createBuffer(
+                buffer.numberOfChannels,
+                buffer.length + Math.floor(echoDelay * echoCount * buffer.sampleRate),
+                buffer.sampleRate
+            );
+            
+            for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+                const originalData = buffer.getChannelData(channel);
+                const newData = newBuffer.getChannelData(channel);
+                
+                // نسخ البيانات الأصلية
+                for (let i = 0; i < originalData.length; i++) {
+                    newData[i] = originalData[i];
+                }
+                
+                // إضافة التكرارات
+                for (let echo = 1; echo <= echoCount; echo++) {
+                    const delaySamples = Math.floor(echoDelay * echo * buffer.sampleRate);
+                    const decay = Math.pow(echoDecay, echo);
+                    
+                    for (let i = 0; i < originalData.length; i++) {
+                        if (i + delaySamples < newData.length) {
+                            newData[i + delaySamples] += originalData[i] * decay;
+                        }
+                    }
+                }
+            }
+            
+            return newBuffer;
+        }
+        
+        function applyReverb(buffer) {
+            // تطبيق صدى بسيط (محاكاة للصدي)
+            const newBuffer = audioContext.createBuffer(
+                buffer.numberOfChannels,
+                buffer.length,
+                buffer.sampleRate
+            );
+            
+            for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+                const originalData = buffer.getChannelData(channel);
+                const newData = newBuffer.getChannelData(channel);
+                
+                // نسخ البيانات الأصلية
+                for (let i = 0; i < originalData.length; i++) {
+                    newData[i] = originalData[i];
+                }
+                
+                // إضافة صدى بسيط
+                const delay = Math.floor(0.03 * buffer.sampleRate); // 30ms delay
+                const decay = 0.7;
+                
+                for (let i = delay; i < originalData.length; i++) {
+                    newData[i] += originalData[i - delay] * decay;
+                }
+            }
+            
+            return newBuffer;
+        }
+        
+        function applyDistortion(buffer) {
+            const newBuffer = audioContext.createBuffer(
+                buffer.numberOfChannels,
+                buffer.length,
+                buffer.sampleRate
+            );
+            
+            for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+                const originalData = buffer.getChannelData(channel);
+                const newData = newBuffer.getChannelData(channel);
+                
+                // تطبيق تشويه بسيط
+                for (let i = 0; i < originalData.length; i++) {
+                    // تشويه باستخدام دالة القطع
+                    let sample = originalData[i] * 2; // تكبير الإشارة
+                    if (sample > 1) sample = 1;
+                    if (sample < -1) sample = -1;
+                    newData[i] = sample;
+                }
+            }
+            
+            return newBuffer;
+        }
+        
+        function downloadAudio() {
+            if (!audioBuffer) {
+                alert('لا يوجد صوت لتحميله');
+                return;
+            }
+            
+            const wavBlob = bufferToWave(audioBuffer, audioBuffer.length);
+            const url = URL.createObjectURL(wavBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'audio_edited.wav';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // دالة لتحويل AudioBuffer إلى Blob بصيغة WAV
+        function bufferToWave(abuffer, len) {
+            const numOfChan = abuffer.numberOfChannels;
+            const length = len * numOfChan * 2;
+            const buffer = new ArrayBuffer(44 + length);
+            const view = new DataView(buffer);
+            const channels = [];
+            let i, sample;
+            let offset = 0;
+            let pos = 0;
+            
+            // write WAVE header
+            setUint32(0x46464952); // "RIFF"
+            setUint32(length + 36); // file length - 8
+            setUint32(0x45564157); // "WAVE"
+            
+            setUint32(0x20746d66); // "fmt " chunk
+            setUint32(16); // length = 16
+            setUint16(1); // PCM (uncompressed)
+            setUint16(numOfChan);
+            setUint32(abuffer.sampleRate);
+            setUint32(abuffer.sampleRate * 2 * numOfChan); // avg. bytes/sec
+            setUint16(numOfChan * 2); // block-align
+            setUint16(16); // 16-bit (hardcoded in this demo)
+            
+            setUint32(0x61746164); // "data" - chunk
+            setUint32(length); // chunk length
+            
+            // write interleaved data
+            for (i = 0; i < abuffer.numberOfChannels; i++)
+                channels.push(abuffer.getChannelData(i));
+            
+            while (pos < length) {
+                for (i = 0; i < numOfChan; i++) {
+                    // interleave channels
+                    sample = Math.max(-1, Math.min(1, channels[i][offset])); // clamp
+                    sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0; // scale to 16-bit signed int
+                    view.setInt16(pos, sample, true); // write 16-bit sample
+                    pos += 2;
+                }
+                offset++; // next source sample
+            }
+            
+            // create Blob
+            return new Blob([buffer], { type: 'audio/wav' });
+            
+            function setUint16(data) {
+                view.setUint16(pos, data, true);
+                pos += 2;
+            }
+            
+            function setUint32(data) {
+                view.setUint32(pos, data, true);
+                pos += 4;
+            }
+        }
+    </script>
 </body>
 </html>
