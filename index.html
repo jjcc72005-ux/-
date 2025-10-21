@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مبدل الصوت</title>
+<title>🎙️ مبدّل الصوت المحلي</title>
 <style>
 body {
-  font-family: sans-serif;
-  background: #111;
+  font-family: system-ui;
+  background: #0b0b0b;
   color: #fff;
   text-align: center;
   padding: 40px;
 }
-button, select {
+select, button {
   margin: 10px;
   padding: 10px 20px;
   font-size: 16px;
@@ -24,13 +24,13 @@ button:hover {
   background: #333;
 }
 audio {
-  margin-top: 20px;
+  margin-top: 25px;
   width: 80%;
 }
 </style>
 </head>
 <body>
-<h2>🎙️ مبدل الصوت البسيط</h2>
+<h2>🎧 مبدّل الصوت المحلي</h2>
 
 <select id="effect">
   <option value="normal">صوت عادي</option>
@@ -44,92 +44,115 @@ audio {
 
 <button id="record">🎤 بدء التسجيل</button>
 <button id="stop" disabled>⏹️ إيقاف</button>
+<button id="download" disabled>⬇️ تحميل الصوت المعدّل</button>
+
 <audio id="player" controls></audio>
 
 <script>
-let mediaRecorder, audioChunks = [];
+let mediaRecorder, audioChunks = [], processedBlob = null;
 
-document.getElementById('record').onclick = async () => {
+const recordBtn = document.getElementById('record');
+const stopBtn = document.getElementById('stop');
+const downloadBtn = document.getElementById('download');
+const player = document.getElementById('player');
+
+recordBtn.onclick = async () => {
   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
   mediaRecorder = new MediaRecorder(stream);
-  mediaRecorder.start();
   audioChunks = [];
   mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-  mediaRecorder.onstop = () => processAudio(new Blob(audioChunks));
-  document.getElementById('record').disabled = true;
-  document.getElementById('stop').disabled = false;
+  mediaRecorder.start();
+  recordBtn.disabled = true;
+  stopBtn.disabled = false;
 };
 
-document.getElementById('stop').onclick = () => {
+stopBtn.onclick = () => {
   mediaRecorder.stop();
-  document.getElementById('record').disabled = false;
-  document.getElementById('stop').disabled = true;
+  stopBtn.disabled = true;
+  recordBtn.disabled = false;
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+    applyEffect(blob);
+  };
 };
 
-function processAudio(blob) {
+async function applyEffect(blob) {
   const effect = document.getElementById('effect').value;
-  const audioCtx = new AudioContext();
-  const reader = new FileReader();
-  reader.readAsArrayBuffer(blob);
-  reader.onloadend = async () => {
-    const buffer = await audioCtx.decodeAudioData(reader.result);
-    const source = audioCtx.createBufferSource();
-    source.buffer = buffer;
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const arrayBuffer = await blob.arrayBuffer();
+  const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
 
-    let output = source;
-    let gainNode = audioCtx.createGain();
-    let filter = audioCtx.createBiquadFilter();
+  const source = audioCtx.createBufferSource();
+  source.buffer = audioBuffer;
 
-    // إعدادات حسب نوع الصوت
-    switch (effect) {
-      case 'female':
-        source.playbackRate.value = 1.5; // أسرع = أنحف
-        break;
-      case 'old':
-        source.playbackRate.value = 0.8; // أبطأ = أغلظ
-        filter.type = "lowpass";
-        filter.frequency.value = 1000;
-        output.connect(filter);
-        output = filter;
-        break;
-      case 'robot':
-        const robotEffect = audioCtx.createWaveShaper();
-        robotEffect.curve = new Float32Array(256).map((_, i) => Math.sin(i));
-        output.connect(robotEffect);
-        output = robotEffect;
-        break;
-      case 'echo':
-        const delay = audioCtx.createDelay();
-        delay.delayTime.value = 0.25;
-        const feedback = audioCtx.createGain();
-        feedback.gain.value = 0.4;
-        delay.connect(feedback);
-        feedback.connect(delay);
-        output.connect(delay);
-        output = delay;
-        break;
-      default:
-        break;
-    }
+  let nodeChain = source;
 
-    output.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-    source.start();
+  // تأثيرات الصوت المختلفة
+  switch (effect) {
+    case 'female':
+      source.playbackRate.value = 1.5;
+      break;
+    case 'old':
+      source.playbackRate.value = 0.8;
+      const lowFilter = audioCtx.createBiquadFilter();
+      lowFilter.type = "lowpass";
+      lowFilter.frequency.value = 1000;
+      nodeChain.connect(lowFilter);
+      nodeChain = lowFilter;
+      break;
+    case 'robot':
+      const robotGain = audioCtx.createGain();
+      robotGain.gain.value = 2.0;
+      const robotDelay = audioCtx.createDelay();
+      robotDelay.delayTime.value = 0.03;
+      nodeChain.connect(robotGain);
+      robotGain.connect(robotDelay);
+      nodeChain = robotDelay;
+      break;
+    case 'echo':
+      const delay = audioCtx.createDelay();
+      delay.delayTime.value = 0.25;
+      const feedback = audioCtx.createGain();
+      feedback.gain.value = 0.4;
+      delay.connect(feedback);
+      feedback.connect(delay);
+      nodeChain.connect(delay);
+      nodeChain = delay;
+      break;
+  }
 
-    // حفظ الملف بعد المعالجة (تسجيل مباشر)
-    const dest = audioCtx.createMediaStreamDestination();
-    output.connect(dest);
-    const recorder = new MediaRecorder(dest.stream);
-    const chunks = [];
-    recorder.ondataavailable = e => chunks.push(e.data);
-    recorder.onstop = e => {
-      const outBlob = new Blob(chunks, { type: 'audio/webm' });
-      document.getElementById('player').src = URL.createObjectURL(outBlob);
-    };
-    recorder.start();
-    setTimeout(() => recorder.stop(), buffer.duration * 1000);
+  // نوجّه الصوت للإخراج وللتسجيل معًا
+  const dest = audioCtx.createMediaStreamDestination();
+  nodeChain.connect(audioCtx.destination);
+  nodeChain.connect(dest);
+
+  // نبدأ التسجيل من الناتج الجديد
+  const recorder = new MediaRecorder(dest.stream);
+  const chunks = [];
+  recorder.ondataavailable = e => chunks.push(e.data);
+  recorder.start();
+
+  source.start();
+
+  setTimeout(() => {
+    recorder.stop();
+    audioCtx.close();
+  }, audioBuffer.duration * 1000);
+
+  recorder.onstop = () => {
+    processedBlob = new Blob(chunks, { type: 'audio/webm' });
+    player.src = URL.createObjectURL(processedBlob);
+    downloadBtn.disabled = false;
   };
 }
+
+downloadBtn.onclick = () => {
+  if (!processedBlob) return;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(processedBlob);
+  a.download = 'voice_modified.webm';
+  a.click();
+};
 </script>
 </body>
 </html>
