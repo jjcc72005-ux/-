@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صوتي | محول الصوت إلى صوت بنات رقيق</title>
+    <title>صوتي | محول الصوت إلى صوت بنات حقيقي</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/soundtouchjs@0.1.0/dist/soundtouch.min.js"></script>
     <style>
         :root {
             --primary: #FF6B8B;
@@ -442,7 +443,7 @@
                 <i class="fas fa-venus logo-icon"></i>
                 <h1>صوتي</h1>
             </div>
-            <p class="subtitle">حول صوتك إلى صوت بنات رقيق وجميل بضغطة زر</p>
+            <p class="subtitle">محول الصوت إلى صوت بنات باستخدام تقنية Pitch Shift الحقيقية</p>
         </header>
         
         <div class="app-container">
@@ -491,7 +492,7 @@
                 <div class="controls-row">
                     <button id="downloadAudio" class="btn btn-success" disabled>
                         <i class="fas fa-download"></i>
-                        <span>تحميل الصوت</span>
+                        <span>تحميل الصوت المعدل</span>
                     </button>
                 </div>
             </div>
@@ -499,63 +500,52 @@
             <div class="panel voices-section">
                 <div class="panel-header">
                     <i class="fas fa-female"></i>
-                    <h2>أصوات البنات</h2>
+                    <h2>أصوات البنات الحقيقية</h2>
                 </div>
                 
                 <div class="voice-categories">
-                    <button class="category-btn active" data-category="soft">ناعمة</button>
-                    <button class="category-btn" data-category="sweet">حلوة</button>
-                    <button class="category-btn" data-category="elegant">راقية</button>
-                    <button class="category-btn" data-category="energetic">نشيطة</button>
+                    <button class="category-btn active" data-category="young">صغيرات</button>
+                    <button class="category-btn" data-category="soft">ناعمات</button>
+                    <button class="category-btn" data-category="mature">ناضجات</button>
                 </div>
                 
                 <div class="voice-effects">
-                    <div class="voice-effect active" data-effect="soft1">
+                    <div class="voice-effect active" data-effect="young1" data-pitch="1.8">
+                        <i class="fas fa-child"></i>
+                        <h4>فتاة صغيرة</h4>
+                        <p>صوت طفولي رفيع</p>
+                    </div>
+                    <div class="voice-effect" data-effect="young2" data-pitch="1.6">
+                        <i class="fas fa-user-graduate"></i>
+                        <h4>مراهقة</h4>
+                        <p>صوت شابة</p>
+                    </div>
+                    <div class="voice-effect" data-effect="soft1" data-pitch="1.4">
                         <i class="fas fa-heart"></i>
-                        <h4>صوت رقيق</h4>
+                        <h4>صوت ناعم</h4>
                         <p>ناعم وجميل</p>
                     </div>
-                    <div class="voice-effect" data-effect="soft2">
+                    <div class="voice-effect" data-effect="soft2" data-pitch="1.3">
                         <i class="fas fa-feather"></i>
-                        <h4>صوت هادئ</h4>
-                        <p>هادئ ومريح</p>
+                        <h4>صوت رقيق</h4>
+                        <p>هادئ ورقيق</p>
                     </div>
-                    <div class="voice-effect" data-effect="sweet1">
-                        <i class="fas fa-smile"></i>
-                        <h4>صوت حلو</h4>
-                        <p>عذب وجذاب</p>
+                    <div class="voice-effect" data-effect="mature1" data-pitch="1.2">
+                        <i class="fas fa-user-tie"></i>
+                        <h4>سيدة ناضجة</h4>
+                        <p>صوت واثق</p>
                     </div>
-                    <div class="voice-effect" data-effect="sweet2">
-                        <i class="fas fa-music"></i>
-                        <h4>صوت ناعم</h4>
-                        <p>رقيق وموسيقي</p>
-                    </div>
-                    <div class="voice-effect" data-effect="elegant1">
+                    <div class="voice-effect" data-effect="mature2" data-pitch="1.1">
                         <i class="fas fa-crown"></i>
-                        <h4>صوت راقي</h4>
-                        <p>أنيق ومهذب</p>
-                    </div>
-                    <div class="voice-effect" data-effect="elegant2">
-                        <i class="fas fa-gem"></i>
-                        <h4>صوت جميل</h4>
-                        <p>فاخر وجميل</p>
-                    </div>
-                    <div class="voice-effect" data-effect="energetic1">
-                        <i class="fas fa-bolt"></i>
-                        <h4>صوت نشيط</h4>
-                        <p>مليء بالحيوية</p>
-                    </div>
-                    <div class="voice-effect" data-effect="energetic2">
-                        <i class="fas fa-sun"></i>
-                        <h4>صوت مشرق</h4>
-                        <p>مفعوم بالطاقة</p>
+                        <h4>صوت أنيق</h4>
+                        <p>راقي ومهذب</p>
                     </div>
                 </div>
             </div>
         </div>
         
         <footer>
-            <p>صوتي - محول الصوت إلى صوت بنات &copy; 2023</p>
+            <p>صوتي - محول الصوت إلى صوت بنات باستخدام SoundTouchJS &copy; 2023</p>
         </footer>
     </div>
 
@@ -572,11 +562,14 @@
         const categoryBtns = document.querySelectorAll('.category-btn');
         
         // متغيرات التطبيق
+        let audioContext;
         let audioStream;
         let recorder;
         let audioChunks = [];
         let audioBlob;
-        let currentEffect = 'soft1';
+        let currentEffect = 'young1';
+        let currentPitch = 1.8;
+        let isProcessing = false;
         
         // إعداد الأحداث
         function setupEventListeners() {
@@ -590,10 +583,18 @@
             // أحداث أصوات البنات
             voiceEffects.forEach(effect => {
                 effect.addEventListener('click', function() {
+                    if (isProcessing) return;
+                    
                     voiceEffects.forEach(e => e.classList.remove('active'));
                     this.classList.add('active');
                     currentEffect = this.getAttribute('data-effect');
+                    currentPitch = parseFloat(this.getAttribute('data-pitch'));
                     showStatus(`تم اختيار ${this.querySelector('h4').textContent}`, 'success');
+                    
+                    // تطبيق التأثير إذا كان هناك صوت
+                    if (audioBlob) {
+                        applyPitchEffect();
+                    }
                 });
             });
             
@@ -614,10 +615,12 @@
         // بدء التسجيل
         async function startRecording() {
             try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 audioStream = await navigator.mediaDevices.getUserMedia({ 
                     audio: {
                         echoCancellation: true,
-                        noiseSuppression: true
+                        noiseSuppression: true,
+                        sampleRate: 44100
                     } 
                 });
                 
@@ -628,12 +631,15 @@
                     audioChunks.push(event.data);
                 };
                 
-                recorder.onstop = () => {
-                    audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                recorder.onstop = async () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                     const audioUrl = URL.createObjectURL(audioBlob);
                     audioPlayer.src = audioUrl;
                     downloadBtn.disabled = false;
-                    showStatus('تم التسجيل بنجاح!', 'success');
+                    showStatus('تم التسجيل! جاري معالجة الصوت...', 'processing');
+                    
+                    // تطبيق التأثير تلقائياً بعد التسجيل
+                    await applyPitchEffect();
                 };
                 
                 recorder.start();
@@ -658,7 +664,7 @@
         }
         
         // رفع ملف صوتي
-        function handleAudioUpload(event) {
+        async function handleAudioUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             
@@ -671,7 +677,109 @@
             audioPlayer.src = audioUrl;
             audioBlob = file;
             downloadBtn.disabled = false;
-            showStatus('تم رفع الملف بنجاح!', 'success');
+            showStatus('تم رفع الملف! جاري المعالجة...', 'processing');
+            
+            // تطبيق التأثير تلقائياً بعد الرفع
+            await applyPitchEffect();
+        }
+        
+        // تطبيق تأثير Pitch Shift
+        async function applyPitchEffect() {
+            if (!audioBlob || isProcessing) return;
+            
+            isProcessing = true;
+            showStatus('جاري معالجة الصوت...', 'processing');
+            
+            try {
+                // تحويل الـ Blob إلى ArrayBuffer
+                const arrayBuffer = await audioBlob.arrayBuffer();
+                
+                // فك تشفير الصوت
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                
+                // إنشاء معالج الصوت
+                const soundTouch = new SoundTouch(audioBuffer.sampleRate);
+                const source = new SoundTouch.SourceAudioBuffer(audioBuffer);
+                const p = new SoundTouch.SoundTouchProcessor(source, soundTouch);
+                
+                // تطبيق إعدادات Pitch
+                soundTouch.pitch = currentPitch;
+                soundTouch.rate = 1.0; // الحفاظ على السرعة الأصلية
+                
+                // معالجة الصوت
+                const processedBuffer = p.process();
+                
+                // تحويل الصوت المعالج إلى Blob
+                const wavBlob = audioBufferToWav(processedBuffer);
+                const processedUrl = URL.createObjectURL(wavBlob);
+                
+                // تحديث المشغل بالصوت الجديد
+                audioPlayer.src = processedUrl;
+                audioBlob = wavBlob;
+                
+                showStatus('تم تحويل الصوت بنجاح!', 'success');
+                
+            } catch (error) {
+                console.error('خطأ في معالجة الصوت:', error);
+                showStatus('حدث خطأ في معالجة الصوت', 'processing');
+            } finally {
+                isProcessing = false;
+            }
+        }
+        
+        // تحويل AudioBuffer إلى WAV Blob
+        function audioBufferToWav(buffer) {
+            const numOfChan = buffer.numberOfChannels;
+            const length = buffer.length * numOfChan * 2;
+            const bufferArray = new ArrayBuffer(44 + length);
+            const view = new DataView(bufferArray);
+            const channels = [];
+            let i, sample;
+            let offset = 0;
+            let pos = 0;
+            
+            // كتابة رأس WAV
+            setUint32(0x46464952); // "RIFF"
+            setUint32(length + 36); // طول الملف - 8
+            setUint32(0x45564157); // "WAVE"
+            
+            setUint32(0x20746d66); // "fmt " chunk
+            setUint32(16); // length = 16
+            setUint16(1); // PCM (uncompressed)
+            setUint16(numOfChan);
+            setUint32(buffer.sampleRate);
+            setUint32(buffer.sampleRate * 2 * numOfChan); // avg. bytes/sec
+            setUint16(numOfChan * 2); // block-align
+            setUint16(16); // 16-bit
+            
+            setUint32(0x61746164); // "data" - chunk
+            setUint32(length); // chunk length
+            
+            // كتابة البيانات
+            for (i = 0; i < buffer.numberOfChannels; i++)
+                channels.push(buffer.getChannelData(i));
+            
+            while (pos < length) {
+                for (i = 0; i < numOfChan; i++) {
+                    sample = Math.max(-1, Math.min(1, channels[i][offset]));
+                    sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0;
+                    view.setInt16(pos, sample, true);
+                    pos += 2;
+                }
+                offset++;
+            }
+            
+            return new Blob([bufferArray], { type: 'audio/wav' });
+            
+            function setUint16(data) {
+                view.setUint16(pos, data, true);
+                pos += 2;
+            }
+            
+            function setUint32(data) {
+                view.setUint32(pos, data, true);
+                pos += 4;
+            }
         }
         
         // تصفية الأصوات حسب التصنيف
@@ -691,6 +799,7 @@
                 voiceEffects.forEach(e => e.classList.remove('active'));
                 firstEffect.classList.add('active');
                 currentEffect = firstEffect.getAttribute('data-effect');
+                currentPitch = parseFloat(firstEffect.getAttribute('data-pitch'));
             }
         }
         
@@ -704,12 +813,12 @@
             const url = URL.createObjectURL(audioBlob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `صوت_بنت_${currentEffect}.webm`;
+            a.download = `صوت_بنت_${currentEffect}.wav`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showStatus('جاري تحميل الصوت...', 'success');
+            showStatus('تم تحميل الصوت!', 'success');
         }
         
         // عرض الحالة
