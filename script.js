@@ -8,6 +8,10 @@ let audioChunks = [];
 let isRecording = false;
 let recordingTimer = null;
 let recordingTime = 0;
+let audioContext = null;
+let analyser = null;
+let canvasContext = null;
+let animationId = null;
 
 // عناصر DOM
 const steps = document.querySelectorAll('.step');
@@ -28,10 +32,12 @@ const timer = document.querySelector('.timer');
 const processing = document.getElementById('processing');
 const result = document.getElementById('result');
 const modifiedAudio = document.getElementById('modifiedAudio');
+const waveformCanvas = document.getElementById('waveformCanvas');
 
 // تهيئة التطبيق
 document.addEventListener('DOMContentLoaded', function() {
     initializeEventListeners();
+    initializeAudioContext();
 });
 
 function initializeEventListeners() {
@@ -66,6 +72,19 @@ function initializeEventListeners() {
     });
 }
 
+// تهيئة AudioContext
+function initializeAudioContext() {
+    try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        
+        canvasContext = waveformCanvas.getContext('2d');
+    } catch (error) {
+        console.error('خطأ في تهيئة AudioContext:', error);
+    }
+}
+
 // التعامل مع رفع الملف
 function handleFileUpload(event) {
     const file = event.target.files[0];
@@ -92,6 +111,7 @@ function handleFileUpload(event) {
 function openRecordModal() {
     recordModal.style.display = 'block';
     resetRecording();
+    drawWaveform(); // رسم الموجة الافتراضية
 }
 
 // إغلاق مودال التسجيل
@@ -100,12 +120,23 @@ function closeRecordModal() {
     if (isRecording) {
         stopRecording();
     }
+    if (animationId) {
+        cancelAnimationFrame(animationId);
+    }
 }
 
 // بدء التسجيل
 async function startRecording() {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+            } 
+        });
+        
+        // إعداد المسجل
         mediaRecorder = new MediaRecorder(stream);
         audioChunks = [];
         
@@ -119,6 +150,14 @@ async function startRecording() {
             playRecordBtn.disabled = false;
         };
         
+        // إعداد التحليل البصري
+        const source = audioContext.createMediaStreamSource(stream);
+        source.connect(analyser);
+        
+        // بدء الرسم البصري
+        drawWaveform();
+        
+        // بدء التسجيل
         mediaRecorder.start();
         isRecording = true;
         startRecordBtn.disabled = true;
@@ -143,7 +182,50 @@ function stopRecording() {
         
         // إيقاف جميع المسارات الصوتية
         mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        
+        // إيقاف الرسم البصري
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+        }
     }
+}
+
+// رسم الموجة الصوتية
+function drawWaveform() {
+    if (!analyser || !canvasContext) return;
+    
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    
+    function draw() {
+        animationId = requestAnimationFrame(draw);
+        
+        if (!isRecording) return;
+        
+        analyser.getByteFrequencyData(dataArray);
+        
+        canvasContext.fillStyle = 'rgb(18, 18, 18)';
+        canvasContext.fillRect(0, 0, waveformCanvas.width, waveformCanvas.height);
+        
+        const barWidth = (waveformCanvas.width / bufferLength) * 2.5;
+        let barHeight;
+        let x = 0;
+        
+        for (let i = 0; i < bufferLength; i++) {
+            barHeight = dataArray[i] / 2;
+            
+            const gradient = canvasContext.createLinearGradient(0, 0, 0, waveformCanvas.height);
+            gradient.addColorStop(0, '#8a2be2');
+            gradient.addColorStop(1, '#ff69b4');
+            
+            canvasContext.fillStyle = gradient;
+            canvasContext.fillRect(x, waveformCanvas.height - barHeight, barWidth, barHeight);
+            
+            x += barWidth + 1;
+        }
+    }
+    
+    draw();
 }
 
 // تشغيل التسجيل
@@ -241,7 +323,7 @@ function updateNavigation() {
     }
 }
 
-// معالجة الصوت
+// معالجة الصوت الحقيقية
 async function processAudio() {
     if (!audioFile) {
         alert('يرجى رفع ملف صوتي أولاً');
@@ -259,18 +341,104 @@ async function processAudio() {
         const modifiedBlob = await applyVoiceEffect(audioFile, selectedVoice);
         
         // عرض النتيجة
-        setTimeout(() => {
-            processing.style.display = 'none';
-            result.style.display = 'block';
-            
-            const url = URL.createObjectURL(modifiedBlob);
-            modifiedAudio.src = url;
-        }, 3000);
+        const url = URL.createObjectURL(modifiedBlob);
+        modifiedAudio.src = url;
+        
+        processing.style.display = 'none';
+        result.style.display = 'block';
         
     } catch (error) {
-        alert('حدث خطأ أثناء معالجة الصوت: ' + error.message);
+        console.error('خطأ في معالجة الصوت:', error);
+        alert('حدث خطأ في معالجة الصوت: ' + error.message);
         processing.style.display = 'none';
     }
+}
+
+// دالة معالجة الصوت الحقيقية
+async function applyVoiceEffect(audioFile, effectType) {
+    try {
+        // تحميل الملف الصوتي
+        const arrayBuffer = await audioFile.arrayBuffer();
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        
+        // إنشاء مصدر الصوت
+        const source = audioContext.createBufferSource();
+        source.buffer = audioBuffer;
+        
+        // الحصول على إعدادات التأثير
+        const settings = getEffectSettings(effectType);
+        
+        // تغيير سرعة التشغيل (يغير النبرة)
+        source.playbackRate.value = settings.playbackRate;
+        
+        // إنشاء معالج الصوت
+        const processor = audioContext.createScriptProcessor(2048, 1, 1);
+        
+        let lastSample = 0;
+        processor.onaudioprocess = (event) => {
+            const input = event.inputBuffer.getChannelData(0);
+            const output = event.outputBuffer.getChannelData(0);
+            
+            for (let i = 0; i < input.length; i++) {
+                // تأثير صوت بنت (رفع الترددات العالية)
+                let sample = input[i] * settings.gain;
+                
+                // إضافة ترددات عالية (High Pass Filter بسيط)
+                sample += (input[i] - lastSample) * settings.highPass;
+                lastSample = input[i];
+                
+                // تقليل الترددات المنخفضة (Low Cut)
+                sample = Math.tanh(sample * 1.5) * 0.8;
+                
+                output[i] = sample;
+            }
+        };
+        
+        // إعداد التسجيل
+        const dest = audioContext.createMediaStreamDestination();
+        const mediaRecorder = new MediaRecorder(dest.stream);
+        
+        return new Promise((resolve) => {
+            const chunks = [];
+            
+            mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'audio/wav' });
+                resolve(blob);
+            };
+            
+            // توصيل السلسلة الصوتية
+            source.connect(processor);
+            processor.connect(dest);
+            
+            // بدء التسجيل والمعالجة
+            mediaRecorder.start();
+            source.start();
+            
+            // إيقاف بعد انتهاء الصوت
+            setTimeout(() => {
+                mediaRecorder.stop();
+                source.stop();
+                audioContext.close();
+            }, audioBuffer.duration * 1000 + 1000);
+        });
+        
+    } catch (error) {
+        console.error('خطأ في معالجة الصوت:', error);
+        throw error;
+    }
+}
+
+// إعدادات التأثيرات المختلفة
+function getEffectSettings(effectType) {
+    const settings = {
+        soft: { playbackRate: 1.3, gain: 1.2, highPass: 0.3 },
+        singer: { playbackRate: 1.4, gain: 1.3, highPass: 0.4 },
+        young: { playbackRate: 1.5, gain: 1.4, highPass: 0.5 },
+        elegant: { playbackRate: 1.25, gain: 1.1, highPass: 0.2 }
+    };
+    return settings[effectType] || settings.soft;
 }
 
 // محاكاة شريط التقدم
@@ -282,7 +450,7 @@ function simulateProgress() {
         if (width >= 100) {
             clearInterval(interval);
         } else {
-            width += Math.random() * 10;
+            width += Math.random() * 15;
             progress.style.width = Math.min(width, 100) + '%';
         }
     }, 200);
@@ -290,17 +458,38 @@ function simulateProgress() {
 
 // معاينة الأصوات
 function playDemo(voiceType) {
-    // في التطبيق الحقيقي، سيتم تشغيل عينات صوتية
-    alert(`تشغيل معاينة صوت ${voiceType}`);
+    // إنشاء صوت معاينة بسيط
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.type = 'sine';
+    oscillator.frequency.value = voiceType === 'soft' ? 440 : 
+                               voiceType === 'singer' ? 523.25 :
+                               voiceType === 'young' ? 587.33 : 392;
+    
+    gainNode.gain.value = 0.1;
+    
+    oscillator.start();
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 1);
+    
+    setTimeout(() => {
+        oscillator.stop();
+    }, 1000);
 }
 
 // تحميل الصوت
 function downloadAudio() {
-    if (modifiedAudio.src) {
+    if (modifiedAudio.src && modifiedAudio.src !== '') {
         const link = document.createElement('a');
         link.href = modifiedAudio.src;
         link.download = `صوت_معدل_${selectedVoice}.wav`;
         link.click();
+    } else {
+        alert('لا يوجد صوت لتحميله');
     }
 }
 
