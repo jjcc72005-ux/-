@@ -438,7 +438,7 @@
                 <i class="fas fa-podcast logo-icon"></i>
                 <h1>صوتي</h1>
             </div>
-            <p class="subtitle">محول الصوت إلى صوت بنات - سجل أو ارفع صوتك وحوله إلى صوت بنات بدرجات مختلفة</p>
+            <p class="subtitle">محول الصوت إلى صوت بنات - سجل أو ارفع صوتك وحوله إلى صوت بنات</p>
         </header>
         
         <div class="panel">
@@ -462,9 +462,9 @@
                 </button>
             </div>
             
-            <div id="recordStatus" class="status hidden">
+            <div id="recordStatus" class="status">
                 <i class="fas fa-info-circle"></i>
-                <span>جاهز للتسجيل</span>
+                <span>انقر على بدء التسجيل للبدء</span>
             </div>
             
             <div class="file-upload">
@@ -482,7 +482,9 @@
                 <i class="fas fa-play-circle"></i>
                 <h2>معاينة الصوت</h2>
             </div>
-            <audio id="audioPlayer" controls class="audio-player"></audio>
+            <audio id="audioPlayer" controls class="audio-player">
+                المتصفح لا يدعم تشغيل الصوت
+            </audio>
             <div class="controls-row">
                 <button id="downloadAudio" class="btn btn-success" disabled>
                     <i class="fas fa-download"></i>
@@ -494,50 +496,29 @@
         <div class="panel">
             <div class="panel-header">
                 <i class="fas fa-female"></i>
-                <h2>أصوات بنات متعددة</h2>
+                <h2>أصوات بنات</h2>
             </div>
             
-            <h3 class="section-title">أصوات بنات بدرجات مختلفة</h3>
             <div class="voice-effects">
-                <div class="voice-effect" data-effect="girl_young">
+                <div class="voice-effect active" data-effect="girl1">
                     <i class="fas fa-female"></i>
-                    <h4>فتاة صغيرة</h4>
-                    <p>صوت فتاة في سن المراهقة</p>
+                    <h4>صوت بنت 1</h4>
+                    <p>صوت بنت عادي</p>
                 </div>
-                <div class="voice-effect" data-effect="girl_soft">
+                <div class="voice-effect" data-effect="girl2">
                     <i class="fas fa-female"></i>
-                    <h4>صوت ناعم</h4>
-                    <p>صوت بنت ناعم ورقيق</p>
+                    <h4>صوت بنت 2</h4>
+                    <p>صوت بنت ناعم</p>
                 </div>
-                <div class="voice-effect" data-effect="girl_confident">
+                <div class="voice-effect" data-effect="girl3">
                     <i class="fas fa-female"></i>
-                    <h4>صوت واثق</h4>
-                    <p>صوت بنت واثق وقوي</p>
+                    <h4>صوت بنت 3</h4>
+                    <p>صوت بنت مرتفع</p>
                 </div>
-                <div class="voice-effect" data-effect="girl_sweet">
+                <div class="voice-effect" data-effect="girl4">
                     <i class="fas fa-female"></i>
-                    <h4>صوت حلو</h4>
-                    <p>صوت بنت عذب وجذاب</p>
-                </div>
-                <div class="voice-effect" data-effect="girl_mature">
-                    <i class="fas fa-female"></i>
-                    <h4>صوت ناضج</h4>
-                    <p>صوت امرأة ناضجة</p>
-                </div>
-                <div class="voice-effect" data-effect="girl_energetic">
-                    <i class="fas fa-female"></i>
-                    <h4>صوت نشيط</h4>
-                    <p>صوت بنت مفعم بالحيوية</p>
-                </div>
-                <div class="voice-effect" data-effect="girl_gentle">
-                    <i class="fas fa-female"></i>
-                    <h4>صوت رقيق</h4>
-                    <p>صوت بنت هادئ ورقيق</p>
-                </div>
-                <div class="voice-effect" data-effect="girl_playful">
-                    <i class="fas fa-female"></i>
-                    <h4>صوت مرحة</h4>
-                    <p>صوت بنت مرح ومليء بالحيوية</p>
+                    <h4>صوت بنت 4</h4>
+                    <p>صوت بنت منخفض</p>
                 </div>
             </div>
         </div>
@@ -566,38 +547,9 @@
         let recorder;
         let audioChunks = [];
         let audioBlob;
-        let audioBuffer;
-        let currentEffect = 'girl_soft';
+        let currentEffect = 'girl1';
         
-        // خصائص التأثيرات المختلفة لأصوات البنات
-        const effectSettings = {
-            girl_young: { pitch: 1.6, formant: 1.4, tone: 1.2, clarity: 0.9 },
-            girl_soft: { pitch: 1.4, formant: 1.3, tone: 1.1, clarity: 1.0 },
-            girl_confident: { pitch: 1.35, formant: 1.25, tone: 1.05, clarity: 1.1 },
-            girl_sweet: { pitch: 1.45, formant: 1.35, tone: 1.15, clarity: 0.95 },
-            girl_mature: { pitch: 1.2, formant: 1.15, tone: 0.95, clarity: 1.05 },
-            girl_energetic: { pitch: 1.5, formant: 1.4, tone: 1.2, clarity: 1.0 },
-            girl_gentle: { pitch: 1.3, formant: 1.2, tone: 1.0, clarity: 0.9 },
-            girl_playful: { pitch: 1.55, formant: 1.45, tone: 1.25, clarity: 1.0 }
-        };
-        
-        // تهيئة العناصر عند تحميل الصفحة
-        window.addEventListener('load', init);
-        
-        function init() {
-            // تهيئة Audio Context
-            try {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                setupVisualizer();
-            } catch (e) {
-                console.error('Web Audio API غير مدعوم في هذا المتصفح', e);
-                showStatus('Web Audio API غير مدعوم في هذا المتصفح', 'processing');
-            }
-            
-            // إعداد مستمعي الأحداث
-            setupEventListeners();
-        }
-        
+        // إعداد المستمعين للأحداث
         function setupEventListeners() {
             // أحداث التسجيل
             startRecordBtn.addEventListener('click', startRecording);
@@ -613,102 +565,52 @@
                     voiceEffects.forEach(e => e.classList.remove('active'));
                     // إضافة النشاط للتأثير المحدد
                     this.classList.add('active');
-                    // تطبيق التأثير
+                    // حفظ التأثير المحدد
                     currentEffect = this.getAttribute('data-effect');
-                    applyVoiceEffect();
+                    showStatus(`تم اختيار ${this.querySelector('h4').textContent}`, 'success');
                 });
             });
             
             // حدث تحميل الصوت
             downloadBtn.addEventListener('click', downloadAudio);
-            
-            // تفعيل أول تأثير افتراضيًا
-            document.querySelector('.voice-effect[data-effect="girl_soft"]').classList.add('active');
         }
         
-        function setupVisualizer() {
-            const canvasContext = visualizerCanvas.getContext('2d');
-            analyser = audioContext.createAnalyser();
-            analyser.fftSize = 256;
-            
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            
-            // ضبط أبعاد canvas
-            visualizerCanvas.width = visualizerCanvas.offsetWidth;
-            visualizerCanvas.height = visualizerCanvas.offsetHeight;
-            
-            function draw() {
-                requestAnimationFrame(draw);
-                
-                analyser.getByteFrequencyData(dataArray);
-                
-                canvasContext.fillStyle = 'rgba(7, 7, 17, 0.1)';
-                canvasContext.fillRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
-                
-                const barWidth = (visualizerCanvas.width / bufferLength) * 2.5;
-                let barHeight;
-                let x = 0;
-                
-                for(let i = 0; i < bufferLength; i++) {
-                    barHeight = dataArray[i] / 2;
-                    
-                    // تدرج لوني حسب شدة الصوت
-                    const gradient = canvasContext.createLinearGradient(0, visualizerCanvas.height - barHeight, 0, visualizerCanvas.height);
-                    gradient.addColorStop(0, '#8A2BE2');
-                    gradient.addColorStop(0.5, '#FF6B8B');
-                    gradient.addColorStop(1, '#00CED1');
-                    
-                    canvasContext.fillStyle = gradient;
-                    canvasContext.fillRect(x, visualizerCanvas.height - barHeight, barWidth, barHeight);
-                    
-                    x += barWidth + 1;
-                }
-            }
-            
-            draw();
-        }
-        
+        // بدء التسجيل
         async function startRecording() {
             try {
-                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                // طلب إذن استخدام الميكروفون
+                audioStream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    } 
+                });
                 
                 // إعداد المسجل
                 recorder = new MediaRecorder(audioStream);
                 audioChunks = [];
                 
+                // عند استقبال بيانات الصوت
                 recorder.ondataavailable = (event) => {
                     audioChunks.push(event.data);
                 };
                 
+                // عند إيقاف التسجيل
                 recorder.onstop = () => {
-                    audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    // إنشاء blob من القطع الصوتية
+                    audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                     const audioUrl = URL.createObjectURL(audioBlob);
-                    audioPlayer.src = audioUrl;
                     
-                    // تحويل Blob إلى AudioBuffer للمعالجة
-                    const fileReader = new FileReader();
-                    fileReader.onload = function() {
-                        audioContext.decodeAudioData(this.result, (buffer) => {
-                            audioBuffer = buffer;
-                            // تطبيق التأثير الافتراضي بعد التسجيل
-                            applyVoiceEffect();
-                        });
-                    };
-                    fileReader.readAsArrayBuffer(audioBlob);
+                    // تعيين مصدر الصوت للمشغل
+                    audioPlayer.src = audioUrl;
                     
                     // تمكين زر التحميل
                     downloadBtn.disabled = false;
                     
                     // تحديث الحالة
-                    showStatus('تم التسجيل بنجاح!', 'success');
+                    showStatus('تم التسجيل بنجاح! يمكنك الآن تحميل الصوت', 'success');
                 };
-                
-                // إعداد التحليل البصري
-                if (audioContext && analyser) {
-                    microphone = audioContext.createMediaStreamSource(audioStream);
-                    microphone.connect(analyser);
-                }
                 
                 // بدء التسجيل
                 recorder.start();
@@ -725,8 +627,9 @@
             }
         }
         
+        // إيقاف التسجيل
         function stopRecording() {
-            if (recorder && recorder.state !== 'inactive') {
+            if (recorder && recorder.state === 'recording') {
                 recorder.stop();
                 
                 // إيقاف جميع المسارات الصوتية
@@ -736,233 +639,115 @@
                 startRecordBtn.disabled = false;
                 stopRecordBtn.disabled = true;
                 
-                showStatus('جاري معالجة الصوت...', 'processing');
+                showStatus('تم إيقاف التسجيل', 'success');
             }
         }
         
+        // معالجة رفع الملف
         function handleAudioUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             
-            const fileReader = new FileReader();
-            
-            fileReader.onload = function() {
-                const audioUrl = URL.createObjectURL(file);
-                audioPlayer.src = audioUrl;
-                
-                audioContext.decodeAudioData(this.result, (buffer) => {
-                    audioBuffer = buffer;
-                    // تطبيق التأثير الافتراضي بعد الرفع
-                    applyVoiceEffect();
-                    
-                    // تمكين زر التحميل
-                    downloadBtn.disabled = false;
-                    
-                    // تحديث الحالة
-                    showStatus('تم تحميل الملف بنجاح!', 'success');
-                });
-            };
-            
-            fileReader.readAsArrayBuffer(file);
-        }
-        
-        function applyVoiceEffect() {
-            if (!audioBuffer) {
-                alert('يرجى تسجيل أو تحميل ملف صوتي أولاً');
+            // التحقق من نوع الملف
+            if (!file.type.startsWith('audio/')) {
+                showStatus('الملف المختار ليس ملف صوتي', 'processing');
                 return;
             }
             
-            const settings = effectSettings[currentEffect];
-            
-            // إنشاء AudioBuffer جديد مع التأثير المطلوب
-            const processedBuffer = applyGirlVoiceEffect(audioBuffer, settings);
-            
-            // إنشاء Blob جديد وتحديث المشغل
-            const wavBlob = bufferToWave(processedBuffer, processedBuffer.length);
-            const audioUrl = URL.createObjectURL(wavBlob);
+            // إنشاء رابط للملف
+            const audioUrl = URL.createObjectURL(file);
             audioPlayer.src = audioUrl;
             
-            showStatus(`تم تطبيق صوت ${getEffectName(currentEffect)} بنجاح!`, 'success');
-        }
-        
-        function applyGirlVoiceEffect(buffer, settings) {
-            // إنشاء buffer جديد
-            const newBuffer = audioContext.createBuffer(
-                buffer.numberOfChannels,
-                buffer.length,
-                buffer.sampleRate
-            );
+            // حفظ الملف كـ blob للتحميل لاحقًا
+            audioBlob = file;
             
-            for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
-                const originalData = buffer.getChannelData(channel);
-                const newData = newBuffer.getChannelData(channel);
-                
-                // نسخ البيانات الأصلية
-                for (let i = 0; i < buffer.length; i++) {
-                    newData[i] = originalData[i];
-                }
-                
-                // تطبيق تغيير النغمة (Pitch)
-                applyPitchShift(newData, settings.pitch);
-                
-                // تطبيق تأثير الفورمات (Formant) لمحاكاة صوت البنات
-                applyFormantShift(newData, settings.formant);
-                
-                // تحسين النغمة
-                applyToneAdjustment(newData, settings.tone);
-                
-                // تحسين الوضوح
-                applyClarityAdjustment(newData, settings.clarity);
-            }
+            // تمكين زر التحميل
+            downloadBtn.disabled = false;
             
-            return newBuffer;
+            showStatus('تم تحميل الملف بنجاح!', 'success');
         }
         
-        function applyPitchShift(data, pitchFactor) {
-            // تغيير نغمة الصوت
-            for (let i = 0; i < data.length; i++) {
-                const sourceIndex = Math.floor(i / pitchFactor);
-                if (sourceIndex < data.length) {
-                    data[i] = data[sourceIndex] * pitchFactor;
-                }
-            }
-        }
-        
-        function applyFormantShift(data, formantFactor) {
-            // محاكاة تأثير الفورمات للصوت الأنثوي
-            for (let i = 1; i < data.length - 1; i++) {
-                // زيادة الترددات المتوسطة والعالية
-                data[i] = data[i] * (0.7 + 0.3 * formantFactor);
-                
-                // تقليل الترددات المنخفضة قليلاً
-                if (i > 1) {
-                    data[i] -= data[i-1] * 0.1 * (formantFactor - 1);
-                }
-            }
-        }
-        
-        function applyToneAdjustment(data, toneFactor) {
-            // تحسين نغمة الصوت
-            for (let i = 0; i < data.length; i++) {
-                data[i] = Math.tanh(data[i] * toneFactor * 1.5) * 0.8;
-            }
-        }
-        
-        function applyClarityAdjustment(data, clarityFactor) {
-            // تحسين وضوح الصوت
-            for (let i = 1; i < data.length - 1; i++) {
-                // تعزيز الحدة
-                data[i] = data[i] * clarityFactor + (data[i] - data[i-1]) * 0.1;
-                
-                // منع القص
-                if (data[i] > 0.95) data[i] = 0.95;
-                if (data[i] < -0.95) data[i] = -0.95;
-            }
-        }
-        
-        function getEffectName(effect) {
-            const names = {
-                'girl_young': 'فتاة صغيرة',
-                'girl_soft': 'ناعم',
-                'girl_confident': 'واثق',
-                'girl_sweet': 'حلو',
-                'girl_mature': 'ناضج',
-                'girl_energetic': 'نشيط',
-                'girl_gentle': 'رقيق',
-                'girl_playful': 'مرحة'
-            };
-            return names[effect] || 'بنت';
-        }
-        
+        // تحميل الصوت
         function downloadAudio() {
-            if (!audioBuffer) {
-                alert('لا يوجد صوت لتحميله');
+            if (!audioBlob) {
+                showStatus('لا يوجد صوت لتحميله', 'processing');
                 return;
             }
             
-            const wavBlob = bufferToWave(audioBuffer, audioBuffer.length);
-            const url = URL.createObjectURL(wavBlob);
+            // إنشاء رابط للتحميل
+            const url = URL.createObjectURL(audioBlob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `صوت_بنت_${getEffectName(currentEffect)}.wav`;
+            a.download = `صوت_بنت_${currentEffect}.webm`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            
+            showStatus('جاري تحميل الصوت...', 'success');
         }
         
+        // عرض الحالة
         function showStatus(message, type) {
             recordStatus.textContent = message;
             recordStatus.className = 'status';
-            recordStatus.classList.add(type);
             
             if (type === 'recording') {
+                recordStatus.classList.add('recording');
                 recordStatus.innerHTML = `<div class="pulse"></div><span>${message}</span>`;
-            } else {
-                const icon = type === 'success' ? 'fa-check-circle' : 
-                            type === 'processing' ? 'fa-sync-alt' : 'fa-info-circle';
-                recordStatus.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+            } else if (type === 'processing') {
+                recordStatus.classList.add('processing');
+                recordStatus.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i><span>${message}</span>`;
+            } else if (type === 'success') {
+                recordStatus.classList.add('success');
+                recordStatus.innerHTML = `<i class="fas fa-check-circle"></i><span>${message}</span>`;
             }
-            
-            recordStatus.classList.remove('hidden');
         }
         
-        // دالة لتحويل AudioBuffer إلى Blob بصيغة WAV
-        function bufferToWave(abuffer, len) {
-            const numOfChan = abuffer.numberOfChannels;
-            const length = len * numOfChan * 2;
-            const buffer = new ArrayBuffer(44 + length);
-            const view = new DataView(buffer);
-            const channels = [];
-            let i, sample;
-            let offset = 0;
-            let pos = 0;
+        // إعداد المُعرِّف البصري
+        function setupVisualizer() {
+            const canvasContext = visualizerCanvas.getContext('2d');
             
-            // write WAVE header
-            setUint32(0x46464952); // "RIFF"
-            setUint32(length + 36); // file length - 8
-            setUint32(0x45564157); // "WAVE"
+            // ضبط أبعاد canvas
+            visualizerCanvas.width = visualizerCanvas.offsetWidth;
+            visualizerCanvas.height = visualizerCanvas.offsetHeight;
             
-            setUint32(0x20746d66); // "fmt " chunk
-            setUint32(16); // length = 16
-            setUint16(1); // PCM (uncompressed)
-            setUint16(numOfChan);
-            setUint32(abuffer.sampleRate);
-            setUint32(abuffer.sampleRate * 2 * numOfChan); // avg. bytes/sec
-            setUint16(numOfChan * 2); // block-align
-            setUint16(16); // 16-bit (hardcoded in this demo)
-            
-            setUint32(0x61746164); // "data" - chunk
-            setUint32(length); // chunk length
-            
-            // write interleaved data
-            for (i = 0; i < abuffer.numberOfChannels; i++)
-                channels.push(abuffer.getChannelData(i));
-            
-            while (pos < length) {
-                for (i = 0; i < numOfChan; i++) {
-                    // interleave channels
-                    sample = Math.max(-1, Math.min(1, channels[i][offset])); // clamp
-                    sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0; // scale to 16-bit signed int
-                    view.setInt16(pos, sample, true); // write 16-bit sample
-                    pos += 2;
+            function draw() {
+                requestAnimationFrame(draw);
+                
+                // رسم شكل موجي بسيط
+                canvasContext.fillStyle = 'rgba(7, 7, 17, 0.1)';
+                canvasContext.fillRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
+                
+                // رسم خط متحرك
+                canvasContext.beginPath();
+                canvasContext.moveTo(0, visualizerCanvas.height / 2);
+                
+                for(let i = 0; i < visualizerCanvas.width; i++) {
+                    const y = visualizerCanvas.height / 2 + Math.sin((i + Date.now() / 200) * 0.05) * 50;
+                    canvasContext.lineTo(i, y);
                 }
-                offset++; // next source sample
+                
+                // تدرج لوني للخط
+                const gradient = canvasContext.createLinearGradient(0, 0, visualizerCanvas.width, 0);
+                gradient.addColorStop(0, '#8A2BE2');
+                gradient.addColorStop(0.5, '#FF6B8B');
+                gradient.addColorStop(1, '#00CED1');
+                
+                canvasContext.strokeStyle = gradient;
+                canvasContext.lineWidth = 3;
+                canvasContext.stroke();
             }
             
-            // create Blob
-            return new Blob([buffer], { type: 'audio/wav' });
-            
-            function setUint16(data) {
-                view.setUint16(pos, data, true);
-                pos += 2;
-            }
-            
-            function setUint32(data) {
-                view.setUint32(pos, data, true);
-                pos += 4;
-            }
+            draw();
         }
+        
+        // تهيئة التطبيق عند تحميل الصفحة
+        window.addEventListener('load', function() {
+            setupEventListeners();
+            setupVisualizer();
+            showStatus('جاهز للتسجيل - انقر على بدء التسجيل', 'success');
+        });
     </script>
 </body>
 </html>
