@@ -132,12 +132,16 @@ async function startRecording() {
             audio: {
                 echoCancellation: true,
                 noiseSuppression: true,
-                autoGainControl: true
+                autoGainControl: true,
+                sampleRate: 44100,
+                channelCount: 1
             } 
         });
         
         // إعداد المسجل
-        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder = new MediaRecorder(stream, {
+            mimeType: 'audio/webm;codecs=opus'
+        });
         audioChunks = [];
         
         mediaRecorder.ondataavailable = (event) => {
@@ -145,7 +149,7 @@ async function startRecording() {
         };
         
         mediaRecorder.onstop = () => {
-            audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
             useRecordingBtn.disabled = false;
             playRecordBtn.disabled = false;
         };
@@ -240,13 +244,73 @@ function playRecording() {
 // استخدام التسجيل
 function useRecording() {
     if (audioBlob) {
-        audioFile = new File([audioBlob], 'recording.wav', { type: 'audio/wav' });
-        const url = URL.createObjectURL(audioBlob);
-        originalAudio.src = url;
-        audioPreview.style.display = 'block';
-        updateNavigation();
-        closeRecordModal();
+        // تحويل webm إلى wav
+        convertWebmToWav(audioBlob).then(wavBlob => {
+            audioFile = new File([wavBlob], 'recording.wav', { type: 'audio/wav' });
+            const url = URL.createObjectURL(wavBlob);
+            originalAudio.src = url;
+            audioPreview.style.display = 'block';
+            updateNavigation();
+            closeRecordModal();
+        });
     }
+}
+
+// تحويل webm إلى wav
+async function convertWebmToWav(webmBlob) {
+    const audioContext = new AudioContext();
+    const arrayBuffer = await webmBlob.arrayBuffer();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    
+    return audioBufferToWav(audioBuffer);
+}
+
+// تحويل AudioBuffer إلى WAV Blob
+function audioBufferToWav(audioBuffer) {
+    const numChannels = audioBuffer.numberOfChannels;
+    const sampleRate = audioBuffer.sampleRate;
+    const format = 1; // PCM
+    const bitDepth = 16;
+    
+    const bytesPerSample = bitDepth / 8;
+    const blockAlign = numChannels * bytesPerSample;
+    
+    const buffer = new ArrayBuffer(44 + audioBuffer.length * blockAlign);
+    const view = new DataView(buffer);
+    
+    // كتابة header WAV
+    const writeString = function(view, offset, string) {
+        for (let i = 0; i < string.length; i++) {
+            view.setUint8(offset + i, string.charCodeAt(i));
+        }
+    };
+    
+    const floatTo16BitPCM = function(output, offset, input) {
+        for (let i = 0; i < input.length; i++, offset += 2) {
+            const s = Math.max(-1, Math.min(1, input[i]));
+            output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+        }
+    };
+    
+    writeString(view, 0, 'RIFF');
+    view.setUint32(4, 36 + audioBuffer.length * blockAlign, true);
+    writeString(view, 8, 'WAVE');
+    writeString(view, 12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, format, true);
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * blockAlign, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, bitDepth, true);
+    writeString(view, 36, 'data');
+    view.setUint32(40, audioBuffer.length * blockAlign, true);
+    
+    // كتابة بيانات الصوت
+    const channelData = audioBuffer.getChannelData(0);
+    floatTo16BitPCM(view, 44, channelData);
+    
+    return new Blob([view], { type: 'audio/wav' });
 }
 
 // إزالة الصوت
@@ -323,7 +387,7 @@ function updateNavigation() {
     }
 }
 
-// معالجة الصوت الحقيقية
+// معالجة الصوت الحقيقية مع Pitch Shifting
 async function processAudio() {
     if (!audioFile) {
         alert('يرجى رفع ملف صوتي أولاً');
@@ -337,8 +401,8 @@ async function processAudio() {
         // محاكاة التقدم
         simulateProgress();
         
-        // معالجة الصوت الحقيقية
-        const modifiedBlob = await applyVoiceEffect(audioFile, selectedVoice);
+        // معالجة الصوت الحقيقية مع تغيير النبرة
+        const modifiedBlob = await applyAdvancedVoiceEffect(audioFile, selectedVoice);
         
         // عرض النتيجة
         const url = URL.createObjectURL(modifiedBlob);
@@ -354,61 +418,61 @@ async function processAudio() {
     }
 }
 
-// دالة معالجة الصوت الحقيقية
-async function applyVoiceEffect(audioFile, effectType) {
-    try {
-        // تحميل الملف الصوتي
-        const arrayBuffer = await audioFile.arrayBuffer();
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-        
-        // إنشاء مصدر الصوت
-        const source = audioContext.createBufferSource();
-        source.buffer = audioBuffer;
-        
-        // الحصول على إعدادات التأثير
-        const settings = getEffectSettings(effectType);
-        
-        // تغيير سرعة التشغيل (يغير النبرة)
-        source.playbackRate.value = settings.playbackRate;
-        
-        // إنشاء معالج الصوت
-        const processor = audioContext.createScriptProcessor(2048, 1, 1);
-        
-        let lastSample = 0;
-        processor.onaudioprocess = (event) => {
-            const input = event.inputBuffer.getChannelData(0);
-            const output = event.outputBuffer.getChannelData(0);
+// دالة معالجة الصوت المتقدمة مع Pitch Shifting
+async function applyAdvancedVoiceEffect(audioFile, effectType) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const arrayBuffer = await audioFile.arrayBuffer();
+            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
             
-            for (let i = 0; i < input.length; i++) {
-                // تأثير صوت بنت (رفع الترددات العالية)
-                let sample = input[i] * settings.gain;
+            // إعدادات التأثير حسب نوع الصوت
+            const settings = getAdvancedEffectSettings(effectType);
+            
+            // إنشاء مصدر الصوت
+            const source = audioContext.createBufferSource();
+            source.buffer = audioBuffer;
+            
+            // تطبيق Pitch Shifting باستخدام طريقة PSOLA المبسطة
+            const processor = audioContext.createScriptProcessor(4096, 1, 1);
+            
+            let pitchRatio = settings.pitchRatio;
+            let newSampleRate = audioBuffer.sampleRate * pitchRatio;
+            
+            processor.onaudioprocess = function(event) {
+                const inputBuffer = event.inputBuffer;
+                const outputBuffer = event.outputBuffer;
+                const inputData = inputBuffer.getChannelData(0);
+                const outputData = outputBuffer.getChannelData(0);
                 
-                // إضافة ترددات عالية (High Pass Filter بسيط)
-                sample += (input[i] - lastSample) * settings.highPass;
-                lastSample = input[i];
+                // تطبيق Pitch Shifting مبسط
+                for (let i = 0; i < outputBuffer.length; i++) {
+                    const oldIndex = i / pitchRatio;
+                    const index1 = Math.floor(oldIndex);
+                    const index2 = Math.min(index1 + 1, inputData.length - 1);
+                    const fraction = oldIndex - index1;
+                    
+                    // الاستيفاء الخطي
+                    outputData[i] = inputData[index1] * (1 - fraction) + inputData[index2] * fraction;
+                }
                 
-                // تقليل الترددات المنخفضة (Low Cut)
-                sample = Math.tanh(sample * 1.5) * 0.8;
-                
-                output[i] = sample;
-            }
-        };
-        
-        // إعداد التسجيل
-        const dest = audioContext.createMediaStreamDestination();
-        const mediaRecorder = new MediaRecorder(dest.stream);
-        
-        return new Promise((resolve) => {
+                // تطبيق تأثيرات التردد
+                applyFrequencyEffects(outputData, settings);
+            };
+            
+            // إعداد التسجيل
+            const dest = audioContext.createMediaStreamDestination();
+            const mediaRecorder = new MediaRecorder(dest.stream);
             const chunks = [];
             
             mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
             mediaRecorder.onstop = () => {
                 const blob = new Blob(chunks, { type: 'audio/wav' });
                 resolve(blob);
+                audioContext.close();
             };
             
-            // توصيل السلسلة الصوتية
+            // توصيل المعالجات
             source.connect(processor);
             processor.connect(dest);
             
@@ -420,23 +484,75 @@ async function applyVoiceEffect(audioFile, effectType) {
             setTimeout(() => {
                 mediaRecorder.stop();
                 source.stop();
-                audioContext.close();
-            }, audioBuffer.duration * 1000 + 1000);
-        });
+            }, (audioBuffer.duration * 1000) / pitchRatio + 1000);
+            
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+// تطبيق تأثيرات التردد المتقدمة
+function applyFrequencyEffects(audioData, settings) {
+    const length = audioData.length;
+    
+    // High-pass filter لإزالة الترددات المنخفضة (لجعل الصوت أنثوي)
+    let prevSample = 0;
+    for (let i = 0; i < length; i++) {
+        const highPass = audioData[i] - prevSample;
+        audioData[i] = highPass * settings.highPassGain;
+        prevSample = audioData[i];
+    }
+    
+    // Boost للترددات المتوسطة والعالية
+    for (let i = 0; i < length; i++) {
+        // تضخيم الترددات العالية
+        audioData[i] = Math.tanh(audioData[i] * settings.distortion) * settings.outputGain;
         
-    } catch (error) {
-        console.error('خطأ في معالجة الصوت:', error);
-        throw error;
+        // تقليل الترددات المنخفضة جداً
+        if (Math.abs(audioData[i]) < 0.01) {
+            audioData[i] *= 0.5;
+        }
+    }
+    
+    // تطبيق تأثير الاهتزاز الأنثوي
+    for (let i = 1; i < length - 1; i++) {
+        const vibrato = Math.sin(i * 0.01) * settings.vibrato;
+        audioData[i] = audioData[i] * (1 + vibrato) + audioData[i-1] * vibrato;
     }
 }
 
-// إعدادات التأثيرات المختلفة
-function getEffectSettings(effectType) {
+// إعدادات التأثيرات المتقدمة
+function getAdvancedEffectSettings(effectType) {
     const settings = {
-        soft: { playbackRate: 1.3, gain: 1.2, highPass: 0.3 },
-        singer: { playbackRate: 1.4, gain: 1.3, highPass: 0.4 },
-        young: { playbackRate: 1.5, gain: 1.4, highPass: 0.5 },
-        elegant: { playbackRate: 1.25, gain: 1.1, highPass: 0.2 }
+        soft: { 
+            pitchRatio: 1.8,        // رفع النبرة بشكل كبير
+            highPassGain: 1.8,      // تضخيم الترددات العالية
+            distortion: 1.3,        // تشويه بسيط للصوت
+            outputGain: 0.8,        // تخفيف الصوت النهائي
+            vibrato: 0.02           // اهتزاز خفيف
+        },
+        singer: { 
+            pitchRatio: 1.9,
+            highPassGain: 2.0,
+            distortion: 1.4,
+            outputGain: 0.9,
+            vibrato: 0.03
+        },
+        young: { 
+            pitchRatio: 2.0,        // أعلى نبرة للصوت الشاب
+            highPassGain: 2.2,
+            distortion: 1.5,
+            outputGain: 1.0,
+            vibrato: 0.04
+        },
+        elegant: { 
+            pitchRatio: 1.7,        // نبرة متوسطة راقية
+            highPassGain: 1.6,
+            distortion: 1.2,
+            outputGain: 0.7,
+            vibrato: 0.01
+        }
     };
     return settings[effectType] || settings.soft;
 }
@@ -458,27 +574,38 @@ function simulateProgress() {
 
 // معاينة الأصوات
 function playDemo(voiceType) {
-    // إنشاء صوت معاينة بسيط
+    const settings = getAdvancedEffectSettings(voiceType);
+    
+    // إنشاء صوت معاينة أكثر تعقيداً
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
+    const oscillator1 = audioContext.createOscillator();
+    const oscillator2 = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
+    const filter = audioContext.createBiquadFilter();
     
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+    oscillator1.connect(gainNode);
+    oscillator2.connect(gainNode);
+    gainNode.connect(filter);
+    filter.connect(audioContext.destination);
     
-    oscillator.type = 'sine';
-    oscillator.frequency.value = voiceType === 'soft' ? 440 : 
-                               voiceType === 'singer' ? 523.25 :
-                               voiceType === 'young' ? 587.33 : 392;
+    oscillator1.type = 'sine';
+    oscillator2.type = 'triangle';
+    oscillator1.frequency.value = 440 * settings.pitchRatio;
+    oscillator2.frequency.value = 660 * settings.pitchRatio;
+    
+    filter.type = 'highpass';
+    filter.frequency.value = 800;
     
     gainNode.gain.value = 0.1;
     
-    oscillator.start();
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 1);
+    oscillator1.start();
+    oscillator2.start();
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 1.5);
     
     setTimeout(() => {
-        oscillator.stop();
-    }, 1000);
+        oscillator1.stop();
+        oscillator2.stop();
+    }, 1500);
 }
 
 // تحميل الصوت
@@ -486,7 +613,7 @@ function downloadAudio() {
     if (modifiedAudio.src && modifiedAudio.src !== '') {
         const link = document.createElement('a');
         link.href = modifiedAudio.src;
-        link.download = `صوت_معدل_${selectedVoice}.wav`;
+        link.download = `صوت_بنت_${selectedVoice}.wav`;
         link.click();
     } else {
         alert('لا يوجد صوت لتحميله');
