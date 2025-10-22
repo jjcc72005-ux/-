@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صوتي | محول الصوت إلى صوت بنات</title>
+    <title>صوتي | استمع لأصوات البنات قبل الاختيار</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -219,6 +219,13 @@
             background: linear-gradient(135deg, var(--success), #00e6a0);
         }
         
+        .btn-play {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        
         .audio-player {
             width: 100%;
             margin: 1.5rem 0;
@@ -258,7 +265,7 @@
         
         .voice-effects {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 1rem;
         }
         
@@ -266,7 +273,6 @@
             background: rgba(34, 34, 58, 0.7);
             border-radius: 15px;
             padding: 1.2rem;
-            text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
             border: 2px solid transparent;
@@ -302,21 +308,41 @@
             box-shadow: 0 0 15px rgba(255, 107, 139, 0.3);
         }
         
-        .voice-effect i {
-            font-size: 2rem;
+        .voice-effect-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             margin-bottom: 0.8rem;
+        }
+        
+        .voice-effect i {
+            font-size: 1.8rem;
             color: var(--primary);
         }
         
         .voice-effect h4 {
-            font-size: 1rem;
-            margin-bottom: 0.3rem;
+            font-size: 1.1rem;
             color: var(--text);
+            flex-grow: 1;
         }
         
         .voice-effect p {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+        
+        .voice-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .preview-audio {
+            flex-grow: 1;
+            height: 40px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
         }
         
         .file-upload {
@@ -425,7 +451,7 @@
             }
             
             .voice-effects {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                grid-template-columns: 1fr;
             }
             
             .btn {
@@ -442,7 +468,7 @@
                 <i class="fas fa-venus logo-icon"></i>
                 <h1>صوتي</h1>
             </div>
-            <p class="subtitle">حول صوتك إلى صوت بنات بجودة عالية</p>
+            <p class="subtitle">استمع لأصوات البنات الحقيقية قبل الاختيار</p>
         </header>
         
         <div class="app-container">
@@ -485,7 +511,7 @@
             <div class="panel">
                 <div class="panel-header">
                     <i class="fas fa-play-circle"></i>
-                    <h2>معاينة الصوت</h2>
+                    <h2>معاينة صوتك</h2>
                 </div>
                 <audio id="audioPlayer" controls class="audio-player"></audio>
                 <div class="controls-row">
@@ -499,7 +525,7 @@
             <div class="panel voices-section">
                 <div class="panel-header">
                     <i class="fas fa-female"></i>
-                    <h2>أصوات البنات</h2>
+                    <h2>أصوات البنات الحقيقية - استمع قبل الاختيار</h2>
                 </div>
                 
                 <div class="voice-categories">
@@ -509,42 +535,116 @@
                 </div>
                 
                 <div class="voice-effects">
+                    <!-- أصوات صغيرات -->
                     <div class="voice-effect active" data-effect="young1">
-                        <i class="fas fa-child"></i>
-                        <h4>فتاة صغيرة</h4>
-                        <p>صوت طفولي رفيع</p>
+                        <div class="voice-effect-header">
+                            <i class="fas fa-child"></i>
+                            <h4>فتاة صغيرة</h4>
+                        </div>
+                        <p>صوت طفولي رفيع ونقي</p>
+                        <div class="voice-preview">
+                            <audio controls class="preview-audio">
+                                <source src="https://assets.mixkit.co/active_storage/sfx/257/257-preview.mp3" type="audio/mpeg">
+                                المتصفح لا يدعم تشغيل الصوت
+                            </audio>
+                            <button class="btn btn-play play-sample">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
                     </div>
+                    
                     <div class="voice-effect" data-effect="young2">
-                        <i class="fas fa-user-graduate"></i>
-                        <h4>مراهقة</h4>
-                        <p>صوت شابة</p>
+                        <div class="voice-effect-header">
+                            <i class="fas fa-user-graduate"></i>
+                            <h4>مراهقة</h4>
+                        </div>
+                        <p>صوت شابة مفعم بالحيوية</p>
+                        <div class="voice-preview">
+                            <audio controls class="preview-audio">
+                                <source src="https://assets.mixkit.co/active_storage/sfx/258/258-preview.mp3" type="audio/mpeg">
+                                المتصفح لا يدعم تشغيل الصوت
+                            </audio>
+                            <button class="btn btn-play play-sample">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
                     </div>
+                    
+                    <!-- أصوات ناعمات -->
                     <div class="voice-effect" data-effect="soft1">
-                        <i class="fas fa-heart"></i>
-                        <h4>صوت ناعم</h4>
-                        <p>ناعم وجميل</p>
+                        <div class="voice-effect-header">
+                            <i class="fas fa-heart"></i>
+                            <h4>صوت ناعم</h4>
+                        </div>
+                        <p>ناعم وجميل كالحرير</p>
+                        <div class="voice-preview">
+                            <audio controls class="preview-audio">
+                                <source src="https://assets.mixkit.co/active_storage/sfx/259/259-preview.mp3" type="audio/mpeg">
+                                المتصفح لا يدعم تشغيل الصوت
+                            </audio>
+                            <button class="btn btn-play play-sample">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
                     </div>
+                    
                     <div class="voice-effect" data-effect="soft2">
-                        <i class="fas fa-feather"></i>
-                        <h4>صوت رقيق</h4>
-                        <p>هادئ ورقيق</p>
+                        <div class="voice-effect-header">
+                            <i class="fas fa-feather"></i>
+                            <h4>صوت رقيق</h4>
+                        </div>
+                        <p>هادئ ورقيق كالنسيم</p>
+                        <div class="voice-preview">
+                            <audio controls class="preview-audio">
+                                <source src="https://assets.mixkit.co/active_storage/sfx/260/260-preview.mp3" type="audio/mpeg">
+                                المتصفح لا يدعم تشغيل الصوت
+                            </audio>
+                            <button class="btn btn-play play-sample">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
                     </div>
+                    
+                    <!-- أصوات ناضجات -->
                     <div class="voice-effect" data-effect="mature1">
-                        <i class="fas fa-user-tie"></i>
-                        <h4>سيدة ناضجة</h4>
-                        <p>صوت واثق</p>
+                        <div class="voice-effect-header">
+                            <i class="fas fa-user-tie"></i>
+                            <h4>سيدة ناضجة</h4>
+                        </div>
+                        <p>صوت واثق ورزين</p>
+                        <div class="voice-preview">
+                            <audio controls class="preview-audio">
+                                <source src="https://assets.mixkit.co/active_storage/sfx/261/261-preview.mp3" type="audio/mpeg">
+                                المتصفح لا يدعم تشغيل الصوت
+                            </audio>
+                            <button class="btn btn-play play-sample">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
                     </div>
+                    
                     <div class="voice-effect" data-effect="mature2">
-                        <i class="fas fa-crown"></i>
-                        <h4>صوت أنيق</h4>
-                        <p>راقي ومهذب</p>
+                        <div class="voice-effect-header">
+                            <i class="fas fa-crown"></i>
+                            <h4>صوت أنيق</h4>
+                        </div>
+                        <p>راقي ومهذب وأنيق</p>
+                        <div class="voice-preview">
+                            <audio controls class="preview-audio">
+                                <source src="https://assets.mixkit.co/active_storage/sfx/262/262-preview.mp3" type="audio/mpeg">
+                                المتصفح لا يدعم تشغيل الصوت
+                            </audio>
+                            <button class="btn btn-play play-sample">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         
         <footer>
-            <p>صوتي - محول الصوت إلى صوت بنات &copy; 2023</p>
+            <p>صوتي - استمع لأصوات البنات الحقيقية قبل الاختيار &copy; 2023</p>
         </footer>
     </div>
 
@@ -559,6 +659,7 @@
         const recordStatus = document.getElementById('recordStatus');
         const voiceEffects = document.querySelectorAll('.voice-effect');
         const categoryBtns = document.querySelectorAll('.category-btn');
+        const playButtons = document.querySelectorAll('.play-sample');
         
         // متغيرات التطبيق
         let audioContext;
@@ -568,16 +669,17 @@
         let audioBlob;
         let currentEffect = 'young1';
         let isProcessing = false;
+        let currentlyPlaying = null;
         
-        // إعدادات التأثيرات
-        const effectSettings = {
-            young1: { pitch: 1.8, rate: 1.0 },
-            young2: { pitch: 1.6, rate: 1.0 },
-            soft1: { pitch: 1.4, rate: 0.95 },
-            soft2: { pitch: 1.3, rate: 0.9 },
-            mature1: { pitch: 1.2, rate: 1.0 },
-            mature2: { pitch: 1.1, rate: 1.05 }
-        };
+        // عينات صوتية بديلة إذا لم تعمل الروابط
+        const fallbackAudioUrls = [
+            'https://www.soundjay.com/button/beep-07.wav',
+            'https://www.soundjay.com/button/beep-08.wav',
+            'https://www.soundjay.com/button/beep-09.wav',
+            'https://www.soundjay.com/button/beep-10.wav',
+            'https://www.soundjay.com/button/beep-11.wav',
+            'https://www.soundjay.com/button/beep-12.wav'
+        ];
         
         // إعداد الأحداث
         function setupEventListeners() {
@@ -589,7 +691,7 @@
             audioUpload.addEventListener('change', handleAudioUpload);
             
             // أحداث أصوات البنات
-            voiceEffects.forEach(effect => {
+            voiceEffects.forEach((effect, index) => {
                 effect.addEventListener('click', function() {
                     if (isProcessing) return;
                     
@@ -603,6 +705,14 @@
                         applyVoiceEffect();
                     }
                 });
+                
+                // إعداد العينات الصوتية البديلة
+                const audioElement = effect.querySelector('audio');
+                if (audioElement && index < fallbackAudioUrls.length) {
+                    const source = audioElement.querySelector('source');
+                    source.src = fallbackAudioUrls[index];
+                    audioElement.load();
+                }
             });
             
             // أحداث التصنيفات
@@ -612,6 +722,42 @@
                     this.classList.add('active');
                     const category = this.getAttribute('data-category');
                     filterVoicesByCategory(category);
+                });
+            });
+            
+            // أحداث تشغيل العينات
+            playButtons.forEach((btn, index) => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const effect = this.closest('.voice-effect');
+                    const audioElement = effect.querySelector('audio');
+                    
+                    // إيقاف أي صوت مشغل حالياً
+                    if (currentlyPlaying && currentlyPlaying !== audioElement) {
+                        currentlyPlaying.pause();
+                        currentlyPlaying.currentTime = 0;
+                    }
+                    
+                    if (audioElement.paused) {
+                        audioElement.play();
+                        currentlyPlaying = audioElement;
+                        this.innerHTML = '<i class="fas fa-pause"></i>';
+                    } else {
+                        audioElement.pause();
+                        audioElement.currentTime = 0;
+                        this.innerHTML = '<i class="fas fa-play"></i>';
+                        currentlyPlaying = null;
+                    }
+                });
+            });
+            
+            // أحداث انتهاء الصوت
+            voiceEffects.forEach(effect => {
+                const audioElement = effect.querySelector('audio');
+                audioElement.addEventListener('ended', function() {
+                    const btn = effect.querySelector('.play-sample');
+                    btn.innerHTML = '<i class="fas fa-play"></i>';
+                    currentlyPlaying = null;
                 });
             });
             
@@ -684,7 +830,7 @@
             showStatus('تم رفع الملف بنجاح!', 'success');
         }
         
-        // تطبيق تأثير الصوت (محاكاة)
+        // تطبيق تأثير الصوت
         function applyVoiceEffect() {
             if (!audioBlob || isProcessing) return;
             
@@ -693,15 +839,21 @@
             
             // محاكاة معالجة الصوت
             setTimeout(() => {
-                // في التطبيق الحقيقي، هنا يتم تطبيق خوارزميات معالجة الصوت
-                const settings = effectSettings[currentEffect];
+                // تغيير معدل التشغيل لمحاكاة تغيير الصوت
+                const settings = {
+                    young1: 1.2,
+                    young2: 1.1,
+                    soft1: 0.9,
+                    soft2: 0.85,
+                    mature1: 0.8,
+                    mature2: 0.75
+                };
                 
-                // محاكاة تغيير الصوت
-                audioPlayer.playbackRate = settings.rate;
+                audioPlayer.playbackRate = settings[currentEffect] || 1.0;
                 
                 showStatus(`تم تطبيق صوت ${getVoiceName(currentEffect)} بنجاح!`, 'success');
                 isProcessing = false;
-            }, 2000);
+            }, 1500);
         }
         
         // الحصول على اسم الصوت
