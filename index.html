@@ -533,7 +533,7 @@
                 <i class="fas fa-podcast logo-icon"></i>
                 <h1>صوتي</h1>
             </div>
-            <p class="subtitle">استوديو الصوت المتقدم - سجل وغير صوتك باحترافية مع تأثيرات متعددة</p>
+            <p class="subtitle">استوديو الصوت المتقدم - سجل وغير صوتك باحترافية مع تأثيرات صوت بنات متعددة</p>
         </header>
         
         <div class="main-layout">
@@ -657,25 +657,50 @@
                 <div class="panel">
                     <div class="panel-header">
                         <i class="fas fa-magic"></i>
-                        <h2>تأثيرات الصوت</h2>
+                        <h2>تأثيرات صوت بنات</h2>
                     </div>
                     
-                    <h3 class="section-title">أصوات بنت متعددة</h3>
+                    <h3 class="section-title">نبرات صوت بنات متعددة</h3>
                     <div class="voice-effects">
-                        <div class="voice-effect" data-effect="female1">
+                        <div class="voice-effect" data-effect="female_soft">
                             <i class="fas fa-female"></i>
-                            <h4>صوت بنت ناعم</h4>
-                            <p>صوت أنثوي رقيق وناعم</p>
+                            <h4>صوت ناعم</h4>
+                            <p>نبرة هادئة ورقيقة</p>
                         </div>
-                        <div class="voice-effect" data-effect="female2">
+                        <div class="voice-effect" data-effect="female_energetic">
                             <i class="fas fa-female"></i>
-                            <h4>صوت بنت مرح</h4>
-                            <p>صوت أنثوي مرح وحيوي</p>
+                            <h4>صوت نشيط</h4>
+                            <p>نبرة حيوية ومفعمة بالطاقة</p>
                         </div>
-                        <div class="voice-effect" data-effect="female3">
+                        <div class="voice-effect" data-effect="female_confident">
                             <i class="fas fa-female"></i>
-                            <h4>صوت بنت جاد</h4>
-                            <p>صوت أنثوي جاد وواثق</p>
+                            <h4>صوت واثق</h4>
+                            <p>نبرة قوية وواضحة</p>
+                        </div>
+                        <div class="voice-effect" data-effect="female_elegant">
+                            <i class="fas fa-female"></i>
+                            <h4>صوت أنيق</h4>
+                            <p>نبرة راقية ومهذبة</p>
+                        </div>
+                        <div class="voice-effect" data-effect="female_friendly">
+                            <i class="fas fa-female"></i>
+                            <h4>صوت ودود</h4>
+                            <p>نبرة دافئة ومرحبة</p>
+                        </div>
+                        <div class="voice-effect" data-effect="female_playful">
+                            <i class="fas fa-female"></i>
+                            <h4>صوت مرحة</h4>
+                            <p>نبرة عفوية ومليئة بالمرح</p>
+                        </div>
+                        <div class="voice-effect" data-effect="female_professional">
+                            <i class="fas fa-female"></i>
+                            <h4>صوت محترف</h4>
+                            <p>نبرة رسمية واحترافية</p>
+                        </div>
+                        <div class="voice-effect" data-effect="female_sweet">
+                            <i class="fas fa-female"></i>
+                            <h4>صوت حلو</h4>
+                            <p>نبرة عذبة وجذابة</p>
                         </div>
                     </div>
                     
@@ -695,16 +720,6 @@
                             <i class="fas fa-male"></i>
                             <h4>صوت رجل</h4>
                             <p>صوت رجل عميق</p>
-                        </div>
-                        <div class="voice-effect" data-effect="oldman">
-                            <i class="fas fa-blind"></i>
-                            <h4>رجل عجوز</h4>
-                            <p>صوت رجل مسن</p>
-                        </div>
-                        <div class="voice-effect" data-effect="robot">
-                            <i class="fas fa-robot"></i>
-                            <h4>صوت روبوت</h4>
-                            <p>صوت آلي معدني</p>
                         </div>
                     </div>
                 </div>
@@ -749,6 +764,24 @@
         let audioBuffer;
         let sourceNode;
         let currentEffect = 'normal';
+        
+        // خصائص التأثيرات المختلفة
+        const effectSettings = {
+            // تأثيرات صوت بنات
+            female_soft: { pitch: 1.3, speed: 1.0, formant: 1.2, eq: { high: 1.2, mid: 0.9, low: 0.8 } },
+            female_energetic: { pitch: 1.4, speed: 1.1, formant: 1.3, eq: { high: 1.3, mid: 1.0, low: 0.9 } },
+            female_confident: { pitch: 1.25, speed: 0.95, formant: 1.15, eq: { high: 1.1, mid: 1.1, low: 0.9 } },
+            female_elegant: { pitch: 1.35, speed: 0.9, formant: 1.25, eq: { high: 1.15, mid: 0.95, low: 0.85 } },
+            female_friendly: { pitch: 1.3, speed: 1.05, formant: 1.2, eq: { high: 1.1, mid: 1.0, low: 0.95 } },
+            female_playful: { pitch: 1.45, speed: 1.15, formant: 1.35, eq: { high: 1.25, mid: 1.05, low: 0.9 } },
+            female_professional: { pitch: 1.2, speed: 0.98, formant: 1.1, eq: { high: 1.05, mid: 1.05, low: 0.95 } },
+            female_sweet: { pitch: 1.4, speed: 1.08, formant: 1.3, eq: { high: 1.2, mid: 0.95, low: 0.85 } },
+            
+            // تأثيرات أخرى
+            normal: { pitch: 1.0, speed: 1.0, formant: 1.0, eq: { high: 1.0, mid: 1.0, low: 1.0 } },
+            child: { pitch: 1.6, speed: 1.2, formant: 1.5, eq: { high: 1.4, mid: 1.1, low: 0.8 } },
+            male: { pitch: 0.8, speed: 0.95, formant: 0.85, eq: { high: 0.9, mid: 1.1, low: 1.2 } }
+        };
         
         // تهيئة العناصر عند تحميل الصفحة
         window.addEventListener('load', init);
@@ -1003,7 +1036,7 @@
             
             // نسخ البيانات المطلوبة
             for (let channel = 0; channel < audioBuffer.numberOfChannels; channel++) {
-                const channelData = audioBuffer.getChannelData(channel);
+                const channelData = buffer.getChannelData(channel);
                 const newChannelData = newBuffer.getChannelData(channel);
                 
                 for (let i = 0; i < frameCount; i++) {
@@ -1031,35 +1064,12 @@
                 return;
             }
             
+            const settings = effectSettings[currentEffect];
             let processedBuffer = audioBuffer;
             
             // تطبيق التأثيرات حسب النوع المحدد
-            switch(currentEffect) {
-                case 'female1':
-                    processedBuffer = applyFemaleEffect(audioBuffer, 1.2, 0.95);
-                    break;
-                case 'female2':
-                    processedBuffer = applyFemaleEffect(audioBuffer, 1.3, 0.9);
-                    break;
-                case 'female3':
-                    processedBuffer = applyFemaleEffect(audioBuffer, 1.15, 1.0);
-                    break;
-                case 'child':
-                    processedBuffer = applyChildEffect(audioBuffer);
-                    break;
-                case 'male':
-                    processedBuffer = applyMaleEffect(audioBuffer);
-                    break;
-                case 'oldman':
-                    processedBuffer = applyOldManEffect(audioBuffer);
-                    break;
-                case 'robot':
-                    processedBuffer = applyRobotEffect(audioBuffer);
-                    break;
-                case 'normal':
-                default:
-                    // لا تغيير - الصوت الطبيعي
-                    break;
+            if (currentEffect !== 'normal') {
+                processedBuffer = applyAdvancedVoiceEffect(audioBuffer, settings);
             }
             
             // إنشاء Blob جديد وتحديث المشغل
@@ -1070,11 +1080,14 @@
             showStatus(`تم تطبيق تأثير ${currentEffect} بنجاح!`, 'success');
         }
         
-        function applyFemaleEffect(buffer, pitchFactor, speedFactor) {
-            // تأثير صوت الأنثى مع معاملات قابلة للتعديل
+        function applyAdvancedVoiceEffect(buffer, settings) {
+            const { pitch, speed, formant, eq } = settings;
+            
+            // إنشاء buffer جديد بحجم معدل
+            const newLength = Math.floor(buffer.length / speed);
             const newBuffer = audioContext.createBuffer(
                 buffer.numberOfChannels,
-                Math.floor(buffer.length / speedFactor),
+                newLength,
                 buffer.sampleRate
             );
             
@@ -1082,11 +1095,27 @@
                 const originalData = buffer.getChannelData(channel);
                 const newData = newBuffer.getChannelData(channel);
                 
-                for (let i = 0; i < newData.length; i++) {
-                    // زيادة الطبقة مع الحفاظ على السرعة
-                    let index = Math.floor(i * speedFactor * pitchFactor);
-                    if (index < originalData.length) {
-                        newData[i] = originalData[index];
+                for (let i = 0; i < newLength; i++) {
+                    // حساب الموضع في البيانات الأصلية مع تعديل السرعة والطبقة
+                    let sourceIndex = i * speed * pitch;
+                    
+                    if (sourceIndex < originalData.length) {
+                        // تطبيق تأثير الفورمات (لتحسين جودة الصوت الأنثوي)
+                        let sample = originalData[Math.floor(sourceIndex)];
+                        
+                        // محاكاة تأثير الفورمات عن طريق تغيير ترددات معينة
+                        if (formant > 1.0) {
+                            // زيادة الترددات العالية للصوت الأنثوي
+                            sample = sample * (1 + (formant - 1.0) * 0.3);
+                        } else if (formant < 1.0) {
+                            // زيادة الترددات المنخفضة للصوت الذكوري
+                            sample = sample * (1 + (1.0 - formant) * 0.2);
+                        }
+                        
+                        // تطبيق معادلة الترددات (EQ)
+                        sample = applyEQ(sample, eq);
+                        
+                        newData[i] = Math.max(-1, Math.min(1, sample));
                     } else {
                         newData[i] = 0;
                     }
@@ -1096,97 +1125,31 @@
             return newBuffer;
         }
         
-        function applyChildEffect(buffer) {
-            // لصوت الطفل: زيادة السرعة والطبقة
-            return applyFemaleEffect(buffer, 1.4, 1.2);
-        }
-        
-        function applyMaleEffect(buffer) {
-            // لصوت الرجل: خفض الطبقة قليلاً
-            const newBuffer = audioContext.createBuffer(
-                buffer.numberOfChannels,
-                buffer.length,
-                buffer.sampleRate
-            );
+        function applyEQ(sample, eqSettings) {
+            // محاكاة بسيطة لتأثير المعادلة على العينات
+            // في التطبيق الحقيقي، هذا يتطلب معالجة أكثر تعقيدًا باستخدام مرشحات
+            let result = sample;
             
-            for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
-                const originalData = buffer.getChannelData(channel);
-                const newData = newBuffer.getChannelData(channel);
-                
-                for (let i = 0; i < originalData.length; i++) {
-                    // خفض الطبقة
-                    let index = Math.floor(i * 0.85);
-                    if (index < originalData.length) {
-                        newData[i] = originalData[index];
-                    } else {
-                        newData[i] = 0;
-                    }
-                }
+            // تأثير الترددات العالية
+            if (eqSettings.high > 1.0) {
+                result = result * (1 + (eqSettings.high - 1.0) * 0.5);
+            } else if (eqSettings.high < 1.0) {
+                result = result * eqSettings.high;
             }
             
-            return newBuffer;
-        }
-        
-        function applyOldManEffect(buffer) {
-            // لصوت الرجل العجوز: خفض الطبقة وإضافة خشونة
-            const newBuffer = audioContext.createBuffer(
-                buffer.numberOfChannels,
-                buffer.length,
-                buffer.sampleRate
-            );
-            
-            for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
-                const originalData = buffer.getChannelData(channel);
-                const newData = newBuffer.getChannelData(channel);
-                
-                for (let i = 0; i < originalData.length; i++) {
-                    // خفض الطبقة
-                    let index = Math.floor(i * 0.8);
-                    let sample = 0;
-                    if (index < originalData.length) {
-                        sample = originalData[index];
-                    }
-                    
-                    // إضافة خشونة (تشويه خفيف)
-                    if (Math.random() > 0.97) {
-                        sample *= (0.7 + Math.random() * 0.6);
-                    }
-                    
-                    newData[i] = sample;
-                }
+            // تأثير الترددات المتوسطة
+            if (eqSettings.mid !== 1.0) {
+                result = result * (0.7 + 0.3 * eqSettings.mid);
             }
             
-            return newBuffer;
-        }
-        
-        function applyRobotEffect(buffer) {
-            // لصوت الروبوت: إضافة تشديد وتكرار
-            const newBuffer = audioContext.createBuffer(
-                buffer.numberOfChannels,
-                buffer.length,
-                buffer.sampleRate
-            );
-            
-            for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
-                const originalData = buffer.getChannelData(channel);
-                const newData = newBuffer.getChannelData(channel);
-                
-                for (let i = 0; i < originalData.length; i++) {
-                    let sample = originalData[i];
-                    
-                    // إضافة تشديد روبوتي
-                    sample = Math.sign(sample) * Math.min(Math.abs(sample) * 1.5, 0.8);
-                    
-                    // إضافة تكرار بسيط
-                    if (i > 1000) {
-                        sample += originalData[i - 1000] * 0.3;
-                    }
-                    
-                    newData[i] = sample;
-                }
+            // تأثير الترددات المنخفضة
+            if (eqSettings.low > 1.0) {
+                result = result * (1 + (eqSettings.low - 1.0) * 0.3);
+            } else if (eqSettings.low < 1.0) {
+                result = result * (0.8 + 0.2 * eqSettings.low);
             }
             
-            return newBuffer;
+            return Math.max(-1, Math.min(1, result));
         }
         
         function downloadAudio() {
