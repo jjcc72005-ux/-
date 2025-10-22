@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صوتي | محول الصوت إلى صوت بنات</title>
+    <title>صوتي | محول الصوت إلى صوت بنات رقيق</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #8A2BE2;
-            --primary-light: #9d45e5;
-            --secondary: #FF6B8B;
-            --accent: #00CED1;
-            --dark: #0F0F1E;
-            --darker: #070711;
-            --card-bg: #1A1A2E;
-            --card-hover: #22223a;
-            --text: #E6E6FA;
+            --primary: #FF6B8B;
+            --primary-light: #ff8fa3;
+            --secondary: #8A2BE2;
+            --accent: #FFD166;
+            --dark: #1A1A2E;
+            --darker: #0F0F1E;
+            --card-bg: #22223a;
+            --card-hover: #2a2a45;
+            --text: #F8F7FF;
             --text-light: #B0B0CC;
             --success: #00FFAB;
             --warning: #FFD166;
@@ -36,23 +36,26 @@
             line-height: 1.6;
             min-height: 100vh;
             overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 107, 139, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
         }
         
         header {
-            background: rgba(15, 15, 30, 0.9);
+            background: rgba(26, 26, 46, 0.8);
             backdrop-filter: blur(10px);
-            padding: 1.8rem 0;
+            padding: 1.5rem 0;
             text-align: center;
-            border-radius: 24px;
-            margin-bottom: 2.5rem;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(138, 43, 226, 0.15);
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             overflow: hidden;
         }
@@ -63,7 +66,7 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
+            height: 3px;
             background: var(--gradient);
         }
         
@@ -71,64 +74,66 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 20px;
-            margin-bottom: 15px;
+            gap: 15px;
+            margin-bottom: 10px;
         }
         
         .logo-icon {
-            font-size: 3rem;
+            font-size: 2.5rem;
             background: var(--gradient);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            filter: drop-shadow(0 0 15px rgba(138, 43, 226, 0.5));
+            filter: drop-shadow(0 0 10px rgba(255, 107, 139, 0.5));
         }
         
         h1 {
-            font-size: 3.2rem;
+            font-size: 2.5rem;
             background: var(--gradient);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-shadow: 0 0 25px rgba(138, 43, 226, 0.4);
-            font-weight: 800;
-            letter-spacing: -1px;
+            font-weight: 700;
         }
         
         .subtitle {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             color: var(--text-light);
-            max-width: 600px;
+            max-width: 500px;
             margin: 0 auto;
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
         }
         
         .panel {
             background: var(--card-bg);
-            border-radius: 24px;
-            padding: 2rem;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-            margin-bottom: 2rem;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.05);
             transition: all 0.3s ease;
         }
         
         .panel:hover {
-            transform: translateY(-7px);
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
-            background: var(--card-hover);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
         }
         
         .panel-header {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 1.8rem;
+            gap: 12px;
+            margin-bottom: 1.5rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
         
         .panel-header i {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             background: var(--gradient);
             -webkit-background-clip: text;
             background-clip: text;
@@ -137,19 +142,23 @@
         
         .panel h2 {
             color: var(--text);
-            font-size: 1.7rem;
-            font-weight: 700;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .recording-section {
+            text-align: center;
         }
         
         .visualizer-container {
             position: relative;
             width: 100%;
-            height: 220px;
+            height: 150px;
             background: linear-gradient(180deg, rgba(15, 15, 30, 0.7), rgba(7, 7, 17, 0.9));
-            border-radius: 18px;
-            margin: 1.8rem 0;
+            border-radius: 15px;
+            margin: 1.5rem 0;
             overflow: hidden;
-            border: 1px solid rgba(138, 43, 226, 0.15);
+            border: 1px solid rgba(255, 107, 139, 0.2);
         }
         
         #visualizer {
@@ -160,8 +169,8 @@
         .controls-row {
             display: flex;
             justify-content: center;
-            gap: 1.5rem;
-            margin: 2rem 0;
+            gap: 1rem;
+            margin: 1.5rem 0;
             flex-wrap: wrap;
         }
         
@@ -169,43 +178,25 @@
             background: var(--gradient);
             color: white;
             border: none;
-            padding: 1.2rem 2.5rem;
-            border-radius: 60px;
+            padding: 1rem 2rem;
+            border-radius: 50px;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 600;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 1rem;
-            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(rgba(255,255,255,0.1), transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
+            gap: 0.8rem;
+            box-shadow: 0 6px 15px rgba(255, 107, 139, 0.3);
         }
         
         .btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(138, 43, 226, 0.4);
-        }
-        
-        .btn:hover::before {
-            opacity: 1;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 139, 0.4);
         }
         
         .btn:active {
-            transform: translateY(2px);
+            transform: translateY(1px);
         }
         
         .btn:disabled {
@@ -216,8 +207,12 @@
             box-shadow: none;
         }
         
-        .btn-danger {
-            background: linear-gradient(135deg, var(--danger), #ff8fa3);
+        .btn-record {
+            background: linear-gradient(135deg, var(--primary), #ff8fa3);
+        }
+        
+        .btn-stop {
+            background: linear-gradient(135deg, #ff4757, var(--danger));
         }
         
         .btn-success {
@@ -226,23 +221,51 @@
         
         .audio-player {
             width: 100%;
-            margin: 1.8rem 0;
-            border-radius: 15px;
+            margin: 1.5rem 0;
+            border-radius: 12px;
             background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
+            padding: 12px;
+        }
+        
+        .voices-section {
+            margin-top: 1rem;
+        }
+        
+        .voice-categories {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .category-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            padding: 0.7rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .category-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
         
         .voice-effects {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
         }
         
         .voice-effect {
-            background: rgba(26, 26, 46, 0.7);
-            border-radius: 18px;
-            padding: 1.5rem;
+            background: rgba(34, 34, 58, 0.7);
+            border-radius: 15px;
+            padding: 1.2rem;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -258,14 +281,14 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), transparent);
+            background: linear-gradient(135deg, rgba(255, 107, 139, 0.1), transparent);
             opacity: 0;
             transition: opacity 0.3s;
         }
         
         .voice-effect:hover {
-            transform: translateY(-7px);
-            background: rgba(35, 35, 60, 0.9);
+            transform: translateY(-5px);
+            background: rgba(42, 42, 69, 0.9);
             border-color: var(--primary);
         }
         
@@ -274,75 +297,69 @@
         }
         
         .voice-effect.active {
-            background: rgba(138, 43, 226, 0.15);
+            background: rgba(255, 107, 139, 0.15);
             border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
-            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 107, 139, 0.3);
         }
         
         .voice-effect i {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+            color: var(--primary);
         }
         
         .voice-effect h4 {
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+            color: var(--text);
         }
         
         .voice-effect p {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: var(--text-light);
         }
         
         .file-upload {
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
-            margin-top: 1.8rem;
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
         
         .file-input-label {
-            padding: 2rem;
+            padding: 1.5rem;
             border: 2px dashed rgba(255, 255, 255, 0.15);
-            border-radius: 18px;
+            border-radius: 15px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
         
         .file-input-label:hover {
             border-color: var(--primary);
-            background: rgba(138, 43, 226, 0.05);
+            background: rgba(255, 107, 139, 0.05);
         }
         
         .file-input-label i {
-            font-size: 3rem;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            font-size: 2.5rem;
+            color: var(--primary);
         }
         
         .status {
-            padding: 1.2rem;
-            border-radius: 15px;
-            margin: 1.8rem 0;
+            padding: 1rem;
+            border-radius: 12px;
+            margin: 1rem 0;
             text-align: center;
             font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            font-size: 1.1rem;
+            gap: 10px;
+            font-size: 1rem;
         }
         
         .status.recording {
@@ -352,9 +369,9 @@
         }
         
         .status.processing {
-            background: rgba(0, 206, 209, 0.1);
-            color: var(--accent);
-            border: 1px solid rgba(0, 206, 209, 0.3);
+            background: rgba(255, 209, 102, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(255, 209, 102, 0.3);
         }
         
         .status.success {
@@ -365,17 +382,17 @@
         
         footer {
             text-align: center;
-            margin-top: 4rem;
-            padding: 2rem;
+            margin-top: 3rem;
+            padding: 1.5rem;
             color: var(--text-light);
-            font-size: 1rem;
+            font-size: 0.9rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .pulse {
             display: inline-block;
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
             background: var(--danger);
             box-shadow: 0 0 0 rgba(255, 107, 139, 0.4);
@@ -387,7 +404,7 @@
                 box-shadow: 0 0 0 0 rgba(255, 107, 139, 0.7);
             }
             70% {
-                box-shadow: 0 0 0 12px rgba(255, 107, 139, 0);
+                box-shadow: 0 0 0 10px rgba(255, 107, 139, 0);
             }
             100% {
                 box-shadow: 0 0 0 0 rgba(255, 107, 139, 0);
@@ -398,35 +415,22 @@
             display: none;
         }
         
-        .section-title {
-            font-size: 1.5rem;
-            margin: 2rem 0 1.5rem;
-            padding-bottom: 0.8rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text);
-        }
-
-        .recording-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .recording-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: var(--danger);
-            animation: blink 1.5s infinite;
-        }
-
-        @keyframes blink {
-            0%, 50% {
-                opacity: 1;
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
             }
-            51%, 100% {
-                opacity: 0.3;
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .voice-effects {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -435,101 +439,128 @@
     <div class="container">
         <header>
             <div class="logo-area">
-                <i class="fas fa-podcast logo-icon"></i>
+                <i class="fas fa-venus logo-icon"></i>
                 <h1>صوتي</h1>
             </div>
-            <p class="subtitle">محول الصوت إلى صوت بنات - سجل أو ارفع صوتك وحوله إلى صوت بنات</p>
+            <p class="subtitle">حول صوتك إلى صوت بنات رقيق وجميل بضغطة زر</p>
         </header>
         
-        <div class="panel">
-            <div class="panel-header">
-                <i class="fas fa-microphone-alt"></i>
-                <h2>التسجيل والتحكم</h2>
-            </div>
-            
-            <div class="visualizer-container">
-                <canvas id="visualizer"></canvas>
-            </div>
-            
-            <div class="controls-row">
-                <button id="startRecord" class="btn">
-                    <i class="fas fa-record-vinyl"></i>
-                    <span>بدء التسجيل</span>
-                </button>
-                <button id="stopRecord" class="btn btn-danger" disabled>
-                    <i class="fas fa-stop"></i>
-                    <span>إيقاف التسجيل</span>
-                </button>
-            </div>
-            
-            <div id="recordStatus" class="status">
-                <i class="fas fa-info-circle"></i>
-                <span>انقر على بدء التسجيل للبدء</span>
-            </div>
-            
-            <div class="file-upload">
-                <label for="audioUpload" class="file-input-label">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <span>اسحب وأفلت ملف صوتي هنا أو انقر للاختيار</span>
-                    <small>يدعم MP3, WAV, OGG</small>
-                </label>
-                <input type="file" id="audioUpload" accept="audio/*" class="hidden">
-            </div>
-        </div>
-        
-        <div class="panel">
-            <div class="panel-header">
-                <i class="fas fa-play-circle"></i>
-                <h2>معاينة الصوت</h2>
-            </div>
-            <audio id="audioPlayer" controls class="audio-player">
-                المتصفح لا يدعم تشغيل الصوت
-            </audio>
-            <div class="controls-row">
-                <button id="downloadAudio" class="btn btn-success" disabled>
-                    <i class="fas fa-download"></i>
-                    <span>تحميل الصوت المعدل</span>
-                </button>
-            </div>
-        </div>
-        
-        <div class="panel">
-            <div class="panel-header">
-                <i class="fas fa-female"></i>
-                <h2>أصوات بنات</h2>
-            </div>
-            
-            <div class="voice-effects">
-                <div class="voice-effect active" data-effect="girl1">
-                    <i class="fas fa-female"></i>
-                    <h4>صوت بنت 1</h4>
-                    <p>صوت بنت عادي</p>
+        <div class="app-container">
+            <div class="panel recording-section">
+                <div class="panel-header">
+                    <i class="fas fa-microphone"></i>
+                    <h2>التسجيل والصوت</h2>
                 </div>
-                <div class="voice-effect" data-effect="girl2">
-                    <i class="fas fa-female"></i>
-                    <h4>صوت بنت 2</h4>
-                    <p>صوت بنت ناعم</p>
+                
+                <div class="visualizer-container">
+                    <canvas id="visualizer"></canvas>
                 </div>
-                <div class="voice-effect" data-effect="girl3">
-                    <i class="fas fa-female"></i>
-                    <h4>صوت بنت 3</h4>
-                    <p>صوت بنت مرتفع</p>
+                
+                <div class="controls-row">
+                    <button id="startRecord" class="btn btn-record">
+                        <i class="fas fa-record-vinyl"></i>
+                        <span>بدء التسجيل</span>
+                    </button>
+                    <button id="stopRecord" class="btn btn-stop" disabled>
+                        <i class="fas fa-stop"></i>
+                        <span>إيقاف التسجيل</span>
+                    </button>
                 </div>
-                <div class="voice-effect" data-effect="girl4">
+                
+                <div class="file-upload">
+                    <label for="audioUpload" class="file-input-label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>رفع ملف صوتي</span>
+                        <small>MP3, WAV, OGG</small>
+                    </label>
+                    <input type="file" id="audioUpload" accept="audio/*" class="hidden">
+                </div>
+                
+                <div id="recordStatus" class="status">
+                    <i class="fas fa-info-circle"></i>
+                    <span>جاهز للتسجيل</span>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <i class="fas fa-play-circle"></i>
+                    <h2>معاينة الصوت</h2>
+                </div>
+                <audio id="audioPlayer" controls class="audio-player"></audio>
+                <div class="controls-row">
+                    <button id="downloadAudio" class="btn btn-success" disabled>
+                        <i class="fas fa-download"></i>
+                        <span>تحميل الصوت</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="panel voices-section">
+                <div class="panel-header">
                     <i class="fas fa-female"></i>
-                    <h4>صوت بنت 4</h4>
-                    <p>صوت بنت منخفض</p>
+                    <h2>أصوات البنات</h2>
+                </div>
+                
+                <div class="voice-categories">
+                    <button class="category-btn active" data-category="soft">ناعمة</button>
+                    <button class="category-btn" data-category="sweet">حلوة</button>
+                    <button class="category-btn" data-category="elegant">راقية</button>
+                    <button class="category-btn" data-category="energetic">نشيطة</button>
+                </div>
+                
+                <div class="voice-effects">
+                    <div class="voice-effect active" data-effect="soft1">
+                        <i class="fas fa-heart"></i>
+                        <h4>صوت رقيق</h4>
+                        <p>ناعم وجميل</p>
+                    </div>
+                    <div class="voice-effect" data-effect="soft2">
+                        <i class="fas fa-feather"></i>
+                        <h4>صوت هادئ</h4>
+                        <p>هادئ ومريح</p>
+                    </div>
+                    <div class="voice-effect" data-effect="sweet1">
+                        <i class="fas fa-smile"></i>
+                        <h4>صوت حلو</h4>
+                        <p>عذب وجذاب</p>
+                    </div>
+                    <div class="voice-effect" data-effect="sweet2">
+                        <i class="fas fa-music"></i>
+                        <h4>صوت ناعم</h4>
+                        <p>رقيق وموسيقي</p>
+                    </div>
+                    <div class="voice-effect" data-effect="elegant1">
+                        <i class="fas fa-crown"></i>
+                        <h4>صوت راقي</h4>
+                        <p>أنيق ومهذب</p>
+                    </div>
+                    <div class="voice-effect" data-effect="elegant2">
+                        <i class="fas fa-gem"></i>
+                        <h4>صوت جميل</h4>
+                        <p>فاخر وجميل</p>
+                    </div>
+                    <div class="voice-effect" data-effect="energetic1">
+                        <i class="fas fa-bolt"></i>
+                        <h4>صوت نشيط</h4>
+                        <p>مليء بالحيوية</p>
+                    </div>
+                    <div class="voice-effect" data-effect="energetic2">
+                        <i class="fas fa-sun"></i>
+                        <h4>صوت مشرق</h4>
+                        <p>مفعوم بالطاقة</p>
+                    </div>
                 </div>
             </div>
         </div>
         
         <footer>
-            <p>تم التطوير باستخدام Web Audio API - جميع الحقوق محفوظة &copy; 2023 صوتي</p>
+            <p>صوتي - محول الصوت إلى صوت بنات &copy; 2023</p>
         </footer>
     </div>
 
     <script>
-        // العناصر الرئيسية في الواجهة
+        // العناصر الرئيسية
         const startRecordBtn = document.getElementById('startRecord');
         const stopRecordBtn = document.getElementById('stopRecord');
         const audioPlayer = document.getElementById('audioPlayer');
@@ -538,92 +569,81 @@
         const visualizerCanvas = document.getElementById('visualizer');
         const recordStatus = document.getElementById('recordStatus');
         const voiceEffects = document.querySelectorAll('.voice-effect');
+        const categoryBtns = document.querySelectorAll('.category-btn');
         
-        // متغيرات لتخزين البيانات
-        let audioContext;
-        let analyser;
-        let microphone;
+        // متغيرات التطبيق
         let audioStream;
         let recorder;
         let audioChunks = [];
         let audioBlob;
-        let currentEffect = 'girl1';
+        let currentEffect = 'soft1';
         
-        // إعداد المستمعين للأحداث
+        // إعداد الأحداث
         function setupEventListeners() {
             // أحداث التسجيل
             startRecordBtn.addEventListener('click', startRecording);
             stopRecordBtn.addEventListener('click', stopRecording);
             
-            // أحداث رفع الملف
+            // حدث رفع الملف
             audioUpload.addEventListener('change', handleAudioUpload);
             
-            // أحداث تأثيرات الصوت
+            // أحداث أصوات البنات
             voiceEffects.forEach(effect => {
                 effect.addEventListener('click', function() {
-                    // إزالة النشاط من جميع التأثيرات
                     voiceEffects.forEach(e => e.classList.remove('active'));
-                    // إضافة النشاط للتأثير المحدد
                     this.classList.add('active');
-                    // حفظ التأثير المحدد
                     currentEffect = this.getAttribute('data-effect');
                     showStatus(`تم اختيار ${this.querySelector('h4').textContent}`, 'success');
                 });
             });
             
-            // حدث تحميل الصوت
+            // أحداث التصنيفات
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    categoryBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const category = this.getAttribute('data-category');
+                    filterVoicesByCategory(category);
+                });
+            });
+            
+            // حدث التحميل
             downloadBtn.addEventListener('click', downloadAudio);
         }
         
         // بدء التسجيل
         async function startRecording() {
             try {
-                // طلب إذن استخدام الميكروفون
                 audioStream = await navigator.mediaDevices.getUserMedia({ 
                     audio: {
                         echoCancellation: true,
-                        noiseSuppression: true,
-                        autoGainControl: true
+                        noiseSuppression: true
                     } 
                 });
                 
-                // إعداد المسجل
                 recorder = new MediaRecorder(audioStream);
                 audioChunks = [];
                 
-                // عند استقبال بيانات الصوت
                 recorder.ondataavailable = (event) => {
                     audioChunks.push(event.data);
                 };
                 
-                // عند إيقاف التسجيل
                 recorder.onstop = () => {
-                    // إنشاء blob من القطع الصوتية
                     audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                     const audioUrl = URL.createObjectURL(audioBlob);
-                    
-                    // تعيين مصدر الصوت للمشغل
                     audioPlayer.src = audioUrl;
-                    
-                    // تمكين زر التحميل
                     downloadBtn.disabled = false;
-                    
-                    // تحديث الحالة
-                    showStatus('تم التسجيل بنجاح! يمكنك الآن تحميل الصوت', 'success');
+                    showStatus('تم التسجيل بنجاح!', 'success');
                 };
                 
-                // بدء التسجيل
                 recorder.start();
-                
-                // تحديث واجهة المستخدم
                 startRecordBtn.disabled = true;
                 stopRecordBtn.disabled = false;
-                
                 showStatus('جاري التسجيل...', 'recording');
                 
             } catch (error) {
-                console.error('خطأ في الوصول إلى الميكروفون:', error);
-                showStatus('خطأ في الوصول إلى الميكروفون. يرجى التحقق من الأذونات.', 'processing');
+                console.error('خطأ في الميكروفون:', error);
+                showStatus('خطأ في الوصول إلى الميكروفون', 'processing');
             }
         }
         
@@ -631,40 +651,47 @@
         function stopRecording() {
             if (recorder && recorder.state === 'recording') {
                 recorder.stop();
-                
-                // إيقاف جميع المسارات الصوتية
                 audioStream.getTracks().forEach(track => track.stop());
-                
-                // تحديث واجهة المستخدم
                 startRecordBtn.disabled = false;
                 stopRecordBtn.disabled = true;
-                
-                showStatus('تم إيقاف التسجيل', 'success');
             }
         }
         
-        // معالجة رفع الملف
+        // رفع ملف صوتي
         function handleAudioUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             
-            // التحقق من نوع الملف
             if (!file.type.startsWith('audio/')) {
-                showStatus('الملف المختار ليس ملف صوتي', 'processing');
+                showStatus('الملف ليس ملف صوتي', 'processing');
                 return;
             }
             
-            // إنشاء رابط للملف
             const audioUrl = URL.createObjectURL(file);
             audioPlayer.src = audioUrl;
-            
-            // حفظ الملف كـ blob للتحميل لاحقًا
             audioBlob = file;
-            
-            // تمكين زر التحميل
             downloadBtn.disabled = false;
+            showStatus('تم رفع الملف بنجاح!', 'success');
+        }
+        
+        // تصفية الأصوات حسب التصنيف
+        function filterVoicesByCategory(category) {
+            voiceEffects.forEach(effect => {
+                const effectType = effect.getAttribute('data-effect');
+                if (effectType.startsWith(category)) {
+                    effect.style.display = 'block';
+                } else {
+                    effect.style.display = 'none';
+                }
+            });
             
-            showStatus('تم تحميل الملف بنجاح!', 'success');
+            // تفعيل أول صوت في التصنيف
+            const firstEffect = document.querySelector(`.voice-effect[data-effect^="${category}"]`);
+            if (firstEffect) {
+                voiceEffects.forEach(e => e.classList.remove('active'));
+                firstEffect.classList.add('active');
+                currentEffect = firstEffect.getAttribute('data-effect');
+            }
         }
         
         // تحميل الصوت
@@ -674,7 +701,6 @@
                 return;
             }
             
-            // إنشاء رابط للتحميل
             const url = URL.createObjectURL(audioBlob);
             const a = document.createElement('a');
             a.href = url;
@@ -683,7 +709,6 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            
             showStatus('جاري تحميل الصوت...', 'success');
         }
         
@@ -704,49 +729,44 @@
             }
         }
         
-        // إعداد المُعرِّف البصري
+        // المُعرِّف البصري
         function setupVisualizer() {
             const canvasContext = visualizerCanvas.getContext('2d');
-            
-            // ضبط أبعاد canvas
             visualizerCanvas.width = visualizerCanvas.offsetWidth;
             visualizerCanvas.height = visualizerCanvas.offsetHeight;
             
             function draw() {
                 requestAnimationFrame(draw);
                 
-                // رسم شكل موجي بسيط
-                canvasContext.fillStyle = 'rgba(7, 7, 17, 0.1)';
+                canvasContext.fillStyle = 'rgba(15, 15, 30, 0.2)';
                 canvasContext.fillRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
                 
-                // رسم خط متحرك
+                // رسم موجات متحركة
                 canvasContext.beginPath();
                 canvasContext.moveTo(0, visualizerCanvas.height / 2);
                 
                 for(let i = 0; i < visualizerCanvas.width; i++) {
-                    const y = visualizerCanvas.height / 2 + Math.sin((i + Date.now() / 200) * 0.05) * 50;
+                    const y = visualizerCanvas.height / 2 + Math.sin((i + Date.now() / 150) * 0.05) * 40;
                     canvasContext.lineTo(i, y);
                 }
                 
-                // تدرج لوني للخط
                 const gradient = canvasContext.createLinearGradient(0, 0, visualizerCanvas.width, 0);
-                gradient.addColorStop(0, '#8A2BE2');
-                gradient.addColorStop(0.5, '#FF6B8B');
-                gradient.addColorStop(1, '#00CED1');
+                gradient.addColorStop(0, '#FF6B8B');
+                gradient.addColorStop(0.5, '#8A2BE2');
+                gradient.addColorStop(1, '#FFD166');
                 
                 canvasContext.strokeStyle = gradient;
-                canvasContext.lineWidth = 3;
+                canvasContext.lineWidth = 2;
                 canvasContext.stroke();
             }
             
             draw();
         }
         
-        // تهيئة التطبيق عند تحميل الصفحة
+        // تهيئة التطبيق
         window.addEventListener('load', function() {
             setupEventListeners();
             setupVisualizer();
-            showStatus('جاهز للتسجيل - انقر على بدء التسجيل', 'success');
         });
     </script>
 </body>
