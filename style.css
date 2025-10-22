@@ -391,6 +391,17 @@ nav {
     color: white;
 }
 
+.recorder-visual {
+    margin: 1rem 0;
+    text-align: center;
+}
+
+#waveformCanvas {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 1px solid var(--primary);
+}
+
 .recorder-controls {
     display: flex;
     gap: 1rem;
@@ -405,10 +416,15 @@ nav {
     padding: 10px 20px;
     border-radius: 20px;
     cursor: pointer;
+    transition: all 0.3s;
 }
 
 .record-btn.stop {
     background: #ff4444;
+}
+
+.record-btn:hover:not(:disabled) {
+    transform: scale(1.05);
 }
 
 .record-btn:disabled {
@@ -421,6 +437,7 @@ nav {
     font-size: 1.5rem;
     font-weight: bold;
     margin: 1rem 0;
+    color: var(--accent);
 }
 
 .use-btn {
@@ -433,6 +450,12 @@ nav {
     cursor: pointer;
     width: 100%;
     margin-top: 1rem;
+    transition: all 0.3s;
+}
+
+.use-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
 }
 
 .use-btn:disabled {
@@ -457,6 +480,11 @@ nav {
     border-radius: 15px;
     cursor: pointer;
     margin-top: 1rem;
+    transition: all 0.3s;
+}
+
+.remove-btn:hover {
+    transform: scale(1.05);
 }
 
 /* Result Section */
@@ -475,6 +503,12 @@ nav {
     border-radius: 25px;
     cursor: pointer;
     font-weight: bold;
+    transition: all 0.3s;
+}
+
+.download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
 }
 
 .again-btn {
@@ -485,6 +519,12 @@ nav {
     border-radius: 25px;
     cursor: pointer;
     font-weight: bold;
+    transition: all 0.3s;
+}
+
+.again-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
 }
 
 /* Footer */
@@ -523,5 +563,14 @@ footer {
     
     .result-actions {
         flex-direction: column;
+    }
+    
+    .recorder-controls {
+        flex-direction: column;
+    }
+    
+    .modal-content {
+        margin: 10% auto;
+        width: 95%;
     }
 }
