@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صوتي | استوديو الصوت المتقدم</title>
+    <title>صوتي | محول الصوت إلى صوت بنات</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -39,7 +39,7 @@
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -100,18 +100,6 @@
             color: var(--text-light);
             max-width: 600px;
             margin: 0 auto;
-        }
-        
-        .main-layout {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 2.5rem;
-        }
-        
-        @media (max-width: 1200px) {
-            .main-layout {
-                grid-template-columns: 1fr;
-            }
         }
         
         .panel {
@@ -244,116 +232,9 @@
             padding: 15px;
         }
         
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.8rem;
-            margin-top: 1.8rem;
-        }
-        
-        .tool-card {
-            background: rgba(26, 26, 46, 0.7);
-            border-radius: 18px;
-            padding: 1.8rem;
-            border-left: 5px solid var(--primary);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .tool-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(138, 43, 226, 0.05), transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
-        .tool-card:hover {
-            background: rgba(30, 30, 50, 0.9);
-            border-left-color: var(--accent);
-            transform: translateY(-5px);
-        }
-        
-        .tool-card:hover::before {
-            opacity: 1;
-        }
-        
-        .tool-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 1.2rem;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .tool-card h3 i {
-            color: var(--primary);
-        }
-        
-        .tool-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-        }
-        
-        .range-container {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
-        
-        .range-value {
-            display: flex;
-            justify-content: space-between;
-            font-size: 1rem;
-            color: var(--text-light);
-        }
-        
-        input[type="range"] {
-            width: 100%;
-            height: 10px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            outline: none;
-            -webkit-appearance: none;
-        }
-        
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: var(--primary);
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
-            border: 3px solid white;
-        }
-        
-        input[type="number"], select {
-            width: 100%;
-            padding: 1rem;
-            border-radius: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text);
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-        
-        input[type="number"]:focus, select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
-        }
-        
         .voice-effects {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 1.5rem;
             margin-top: 1.5rem;
         }
@@ -557,171 +438,106 @@
                 <i class="fas fa-podcast logo-icon"></i>
                 <h1>صوتي</h1>
             </div>
-            <p class="subtitle">استوديو الصوت المتقدم - سجل وغير صوتك باحترافية مع تأثيرات صوتية حقيقية</p>
+            <p class="subtitle">محول الصوت إلى صوت بنات - سجل أو ارفع صوتك وحوله إلى صوت بنات بدرجات مختلفة</p>
         </header>
         
-        <div class="main-layout">
-            <div class="left-panel">
-                <div class="panel">
-                    <div class="panel-header">
-                        <i class="fas fa-microphone-alt"></i>
-                        <h2>التسجيل والتحكم</h2>
-                    </div>
-                    
-                    <div class="visualizer-container">
-                        <canvas id="visualizer"></canvas>
-                    </div>
-                    
-                    <div class="controls-row">
-                        <button id="startRecord" class="btn">
-                            <i class="fas fa-record-vinyl"></i>
-                            <span>بدء التسجيل</span>
-                        </button>
-                        <button id="stopRecord" class="btn btn-danger" disabled>
-                            <i class="fas fa-stop"></i>
-                            <span>إيقاف التسجيل</span>
-                        </button>
-                    </div>
-                    
-                    <div id="recordStatus" class="status hidden">
-                        <i class="fas fa-info-circle"></i>
-                        <span>جاهز للتسجيل</span>
-                    </div>
-                    
-                    <div class="file-upload">
-                        <label for="audioUpload" class="file-input-label">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <span>اسحب وأفلت ملف صوتي هنا أو انقر للاختيار</span>
-                            <small>يدعم MP3, WAV, OGG</small>
-                        </label>
-                        <input type="file" id="audioUpload" accept="audio/*" class="hidden">
-                    </div>
-                </div>
-                
-                <div class="panel">
-                    <div class="panel-header">
-                        <i class="fas fa-play-circle"></i>
-                        <h2>معاينة الصوت</h2>
-                    </div>
-                    <audio id="audioPlayer" controls class="audio-player"></audio>
-                    <div class="controls-row">
-                        <button id="downloadAudio" class="btn btn-success" disabled>
-                            <i class="fas fa-download"></i>
-                            <span>تحميل الصوت المعدل</span>
-                        </button>
-                    </div>
-                </div>
+        <div class="panel">
+            <div class="panel-header">
+                <i class="fas fa-microphone-alt"></i>
+                <h2>التسجيل والتحكم</h2>
             </div>
             
-            <div class="right-panel">
-                <div class="panel">
-                    <div class="panel-header">
-                        <i class="fas fa-sliders-h"></i>
-                        <h2>أدوات المعالجة</h2>
-                    </div>
-                    
-                    <div class="tools-grid">
-                        <div class="tool-card">
-                            <h3><i class="fas fa-volume-up"></i> مستوى الصوت</h3>
-                            <div class="tool-controls">
-                                <div class="range-container">
-                                    <div class="range-value">
-                                        <span>0%</span>
-                                        <span id="volumeValue">100%</span>
-                                    </div>
-                                    <input type="range" id="volumeControl" min="0" max="2" step="0.1" value="1">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="tool-card">
-                            <h3><i class="fas fa-tachometer-alt"></i> سرعة التشغيل</h3>
-                            <div class="tool-controls">
-                                <div class="range-container">
-                                    <div class="range-value">
-                                        <span>0.5x</span>
-                                        <span id="playbackRateValue">1x</span>
-                                        <span>2x</span>
-                                    </div>
-                                    <input type="range" id="playbackRate" min="0.5" max="2" step="0.1" value="1">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="tool-card">
-                            <h3><i class="fas fa-waveform"></i> نغمة الصوت</h3>
-                            <div class="tool-controls">
-                                <div class="range-container">
-                                    <div class="range-value">
-                                        <span>منخفضة</span>
-                                        <span id="pitchValue">طبيعي</span>
-                                        <span>عالية</span>
-                                    </div>
-                                    <input type="range" id="pitchControl" min="0.5" max="2" step="0.1" value="1">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="visualizer-container">
+                <canvas id="visualizer"></canvas>
+            </div>
+            
+            <div class="controls-row">
+                <button id="startRecord" class="btn">
+                    <i class="fas fa-record-vinyl"></i>
+                    <span>بدء التسجيل</span>
+                </button>
+                <button id="stopRecord" class="btn btn-danger" disabled>
+                    <i class="fas fa-stop"></i>
+                    <span>إيقاف التسجيل</span>
+                </button>
+            </div>
+            
+            <div id="recordStatus" class="status hidden">
+                <i class="fas fa-info-circle"></i>
+                <span>جاهز للتسجيل</span>
+            </div>
+            
+            <div class="file-upload">
+                <label for="audioUpload" class="file-input-label">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>اسحب وأفلت ملف صوتي هنا أو انقر للاختيار</span>
+                    <small>يدعم MP3, WAV, OGG</small>
+                </label>
+                <input type="file" id="audioUpload" accept="audio/*" class="hidden">
+            </div>
+        </div>
+        
+        <div class="panel">
+            <div class="panel-header">
+                <i class="fas fa-play-circle"></i>
+                <h2>معاينة الصوت</h2>
+            </div>
+            <audio id="audioPlayer" controls class="audio-player"></audio>
+            <div class="controls-row">
+                <button id="downloadAudio" class="btn btn-success" disabled>
+                    <i class="fas fa-download"></i>
+                    <span>تحميل الصوت المعدل</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <div class="panel-header">
+                <i class="fas fa-female"></i>
+                <h2>أصوات بنات متعددة</h2>
+            </div>
+            
+            <h3 class="section-title">أصوات بنات بدرجات مختلفة</h3>
+            <div class="voice-effects">
+                <div class="voice-effect" data-effect="girl_young">
+                    <i class="fas fa-female"></i>
+                    <h4>فتاة صغيرة</h4>
+                    <p>صوت فتاة في سن المراهقة</p>
                 </div>
-                
-                <div class="panel">
-                    <div class="panel-header">
-                        <i class="fas fa-magic"></i>
-                        <h2>تأثيرات صوتية حقيقية</h2>
-                    </div>
-                    
-                    <h3 class="section-title">تأثيرات صوتية متقدمة</h3>
-                    <div class="voice-effects">
-                        <div class="voice-effect" data-effect="echo">
-                            <i class="fas fa-mountain"></i>
-                            <h4>صدى الجبال</h4>
-                            <p>تأثير صدى طبيعي</p>
-                        </div>
-                        <div class="voice-effect" data-effect="reverb">
-                            <i class="fas fa-theater-masks"></i>
-                            <h4>صالة المسرح</h4>
-                            <p>تأثير صوتي كأنك في مسرح</p>
-                        </div>
-                        <div class="voice-effect" data-effect="radio">
-                            <i class="fas fa-broadcast-tower"></i>
-                            <h4>راديو قديم</h4>
-                            <p>تأثير صوت الراديو الكلاسيكي</p>
-                        </div>
-                        <div class="voice-effect" data-effect="telephone">
-                            <i class="fas fa-phone"></i>
-                            <h4>هاتف أرضي</h4>
-                            <p>تأثير صوت الهاتف التقليدي</p>
-                        </div>
-                        <div class="voice-effect" data-effect="underwater">
-                            <i class="fas fa-water"></i>
-                            <h4>تحت الماء</h4>
-                            <p>تأثير صوت تحت الماء</p>
-                        </div>
-                        <div class="voice-effect" data-effect="robot">
-                            <i class="fas fa-robot"></i>
-                            <h4>صوت آلي</h4>
-                            <p>تأثير صوت الروبوت</p>
-                        </div>
-                    </div>
-                    
-                    <h3 class="section-title">تأثيرات صوتية أخرى</h3>
-                    <div class="voice-effects">
-                        <div class="voice-effect" data-effect="normal">
-                            <i class="fas fa-user"></i>
-                            <h4>صوت طبيعي</h4>
-                            <p>الصوت الأصلي بدون تغيير</p>
-                        </div>
-                        <div class="voice-effect" data-effect="deep">
-                            <i class="fas fa-male"></i>
-                            <h4>صوت عميق</h4>
-                            <p>صوت ذكوري عميق</p>
-                        </div>
-                        <div class="voice-effect" data-effect="high">
-                            <i class="fas fa-female"></i>
-                            <h4>صوت مرتفع</h4>
-                            <p>صوت أنثوي مرتفع</p>
-                        </div>
-                    </div>
+                <div class="voice-effect" data-effect="girl_soft">
+                    <i class="fas fa-female"></i>
+                    <h4>صوت ناعم</h4>
+                    <p>صوت بنت ناعم ورقيق</p>
+                </div>
+                <div class="voice-effect" data-effect="girl_confident">
+                    <i class="fas fa-female"></i>
+                    <h4>صوت واثق</h4>
+                    <p>صوت بنت واثق وقوي</p>
+                </div>
+                <div class="voice-effect" data-effect="girl_sweet">
+                    <i class="fas fa-female"></i>
+                    <h4>صوت حلو</h4>
+                    <p>صوت بنت عذب وجذاب</p>
+                </div>
+                <div class="voice-effect" data-effect="girl_mature">
+                    <i class="fas fa-female"></i>
+                    <h4>صوت ناضج</h4>
+                    <p>صوت امرأة ناضجة</p>
+                </div>
+                <div class="voice-effect" data-effect="girl_energetic">
+                    <i class="fas fa-female"></i>
+                    <h4>صوت نشيط</h4>
+                    <p>صوت بنت مفعم بالحيوية</p>
+                </div>
+                <div class="voice-effect" data-effect="girl_gentle">
+                    <i class="fas fa-female"></i>
+                    <h4>صوت رقيق</h4>
+                    <p>صوت بنت هادئ ورقيق</p>
+                </div>
+                <div class="voice-effect" data-effect="girl_playful">
+                    <i class="fas fa-female"></i>
+                    <h4>صوت مرحة</h4>
+                    <p>صوت بنت مرح ومليء بالحيوية</p>
                 </div>
             </div>
         </div>
@@ -740,14 +556,6 @@
         const audioUpload = document.getElementById('audioUpload');
         const visualizerCanvas = document.getElementById('visualizer');
         const recordStatus = document.getElementById('recordStatus');
-        
-        // عناصر أدوات التعديل
-        const volumeControl = document.getElementById('volumeControl');
-        const volumeValue = document.getElementById('volumeValue');
-        const playbackRate = document.getElementById('playbackRate');
-        const playbackRateValue = document.getElementById('playbackRateValue');
-        const pitchControl = document.getElementById('pitchControl');
-        const pitchValue = document.getElementById('pitchValue');
         const voiceEffects = document.querySelectorAll('.voice-effect');
         
         // متغيرات لتخزين البيانات
@@ -759,23 +567,18 @@
         let audioChunks = [];
         let audioBlob;
         let audioBuffer;
-        let sourceNode;
-        let currentEffect = 'normal';
+        let currentEffect = 'girl_soft';
         
-        // خصائص التأثيرات المختلفة
+        // خصائص التأثيرات المختلفة لأصوات البنات
         const effectSettings = {
-            // تأثيرات صوتية حقيقية
-            echo: { delay: 0.3, feedback: 0.7, filter: 1500 },
-            reverb: { duration: 2, decay: 3, reverse: false },
-            radio: { distortion: 0.5, lowPass: 3000, highPass: 300 },
-            telephone: { lowPass: 2000, highPass: 500 },
-            underwater: { lowPass: 1500, highPass: 200, delay: 0.1 },
-            robot: { pitch: 0.8, distortion: 0.9, rate: 0.8 },
-            
-            // تأثيرات صوتية أخرى
-            normal: { pitch: 1.0, rate: 1.0 },
-            deep: { pitch: 0.7, rate: 0.9 },
-            high: { pitch: 1.4, rate: 1.1 }
+            girl_young: { pitch: 1.6, formant: 1.4, tone: 1.2, clarity: 0.9 },
+            girl_soft: { pitch: 1.4, formant: 1.3, tone: 1.1, clarity: 1.0 },
+            girl_confident: { pitch: 1.35, formant: 1.25, tone: 1.05, clarity: 1.1 },
+            girl_sweet: { pitch: 1.45, formant: 1.35, tone: 1.15, clarity: 0.95 },
+            girl_mature: { pitch: 1.2, formant: 1.15, tone: 0.95, clarity: 1.05 },
+            girl_energetic: { pitch: 1.5, formant: 1.4, tone: 1.2, clarity: 1.0 },
+            girl_gentle: { pitch: 1.3, formant: 1.2, tone: 1.0, clarity: 0.9 },
+            girl_playful: { pitch: 1.55, formant: 1.45, tone: 1.25, clarity: 1.0 }
         };
         
         // تهيئة العناصر عند تحميل الصفحة
@@ -793,11 +596,6 @@
             
             // إعداد مستمعي الأحداث
             setupEventListeners();
-            
-            // تحديث القيم الأولية
-            updateVolume();
-            updatePlaybackRate();
-            updatePitch();
         }
         
         function setupEventListeners() {
@@ -807,11 +605,6 @@
             
             // أحداث رفع الملف
             audioUpload.addEventListener('change', handleAudioUpload);
-            
-            // أحداث أدوات التعديل
-            volumeControl.addEventListener('input', updateVolume);
-            playbackRate.addEventListener('input', updatePlaybackRate);
-            pitchControl.addEventListener('input', updatePitch);
             
             // أحداث تأثيرات الصوت
             voiceEffects.forEach(effect => {
@@ -828,6 +621,9 @@
             
             // حدث تحميل الصوت
             downloadBtn.addEventListener('click', downloadAudio);
+            
+            // تفعيل أول تأثير افتراضيًا
+            document.querySelector('.voice-effect[data-effect="girl_soft"]').classList.add('active');
         }
         
         function setupVisualizer() {
@@ -895,6 +691,8 @@
                     fileReader.onload = function() {
                         audioContext.decodeAudioData(this.result, (buffer) => {
                             audioBuffer = buffer;
+                            // تطبيق التأثير الافتراضي بعد التسجيل
+                            applyVoiceEffect();
                         });
                     };
                     fileReader.readAsArrayBuffer(audioBlob);
@@ -954,6 +752,8 @@
                 
                 audioContext.decodeAudioData(this.result, (buffer) => {
                     audioBuffer = buffer;
+                    // تطبيق التأثير الافتراضي بعد الرفع
+                    applyVoiceEffect();
                     
                     // تمكين زر التحميل
                     downloadBtn.disabled = false;
@@ -966,28 +766,6 @@
             fileReader.readAsArrayBuffer(file);
         }
         
-        function updateVolume() {
-            const volume = volumeControl.value;
-            volumeValue.textContent = `${Math.round(volume * 100)}%`;
-            audioPlayer.volume = volume;
-        }
-        
-        function updatePlaybackRate() {
-            const rate = playbackRate.value;
-            playbackRateValue.textContent = `${rate}x`;
-            audioPlayer.playbackRate = rate;
-        }
-        
-        function updatePitch() {
-            const pitch = pitchControl.value;
-            let pitchText = 'طبيعي';
-            
-            if (pitch < 0.9) pitchText = 'منخفضة';
-            else if (pitch > 1.1) pitchText = 'عالية';
-            
-            pitchValue.textContent = pitchText;
-        }
-        
         function applyVoiceEffect() {
             if (!audioBuffer) {
                 alert('يرجى تسجيل أو تحميل ملف صوتي أولاً');
@@ -997,17 +775,17 @@
             const settings = effectSettings[currentEffect];
             
             // إنشاء AudioBuffer جديد مع التأثير المطلوب
-            const processedBuffer = applyAdvancedVoiceEffect(audioBuffer, settings);
+            const processedBuffer = applyGirlVoiceEffect(audioBuffer, settings);
             
             // إنشاء Blob جديد وتحديث المشغل
             const wavBlob = bufferToWave(processedBuffer, processedBuffer.length);
             const audioUrl = URL.createObjectURL(wavBlob);
             audioPlayer.src = audioUrl;
             
-            showStatus(`تم تطبيق تأثير ${currentEffect} بنجاح!`, 'success');
+            showStatus(`تم تطبيق صوت ${getEffectName(currentEffect)} بنجاح!`, 'success');
         }
         
-        function applyAdvancedVoiceEffect(buffer, settings) {
+        function applyGirlVoiceEffect(buffer, settings) {
             // إنشاء buffer جديد
             const newBuffer = audioContext.createBuffer(
                 buffer.numberOfChannels,
@@ -1024,146 +802,76 @@
                     newData[i] = originalData[i];
                 }
                 
-                // تطبيق التأثيرات حسب النوع
-                switch(currentEffect) {
-                    case 'echo':
-                        applyEchoEffect(newData, settings, buffer.sampleRate);
-                        break;
-                    case 'reverb':
-                        applyReverbEffect(newData, settings, buffer.sampleRate);
-                        break;
-                    case 'radio':
-                        applyRadioEffect(newData, settings);
-                        break;
-                    case 'telephone':
-                        applyTelephoneEffect(newData, settings);
-                        break;
-                    case 'underwater':
-                        applyUnderwaterEffect(newData, settings, buffer.sampleRate);
-                        break;
-                    case 'robot':
-                        applyRobotEffect(newData, settings);
-                        break;
-                    case 'deep':
-                        applyPitchEffect(newData, settings.pitch);
-                        break;
-                    case 'high':
-                        applyPitchEffect(newData, settings.pitch);
-                        break;
-                }
+                // تطبيق تغيير النغمة (Pitch)
+                applyPitchShift(newData, settings.pitch);
+                
+                // تطبيق تأثير الفورمات (Formant) لمحاكاة صوت البنات
+                applyFormantShift(newData, settings.formant);
+                
+                // تحسين النغمة
+                applyToneAdjustment(newData, settings.tone);
+                
+                // تحسين الوضوح
+                applyClarityAdjustment(newData, settings.clarity);
             }
             
             return newBuffer;
         }
         
-        function applyEchoEffect(data, settings, sampleRate) {
-            const delaySamples = Math.floor(settings.delay * sampleRate);
-            const feedback = settings.feedback;
-            
-            for (let i = delaySamples; i < data.length; i++) {
-                data[i] += data[i - delaySamples] * feedback;
-                
-                // تطبيق مرشح تمرير منخفض
-                if (i > 0) {
-                    data[i] = data[i] * 0.7 + data[i-1] * 0.3;
-                }
-            }
-        }
-        
-        function applyReverbEffect(data, settings, sampleRate) {
-            const reverbSamples = Math.floor(settings.duration * sampleRate);
-            const decay = settings.decay;
-            
-            for (let i = 0; i < data.length; i++) {
-                for (let j = 1; j <= 5; j++) {
-                    const delay = Math.floor(reverbSamples / j);
-                    if (i >= delay) {
-                        const attenuation = Math.exp(-j / decay);
-                        data[i] += data[i - delay] * attenuation * 0.3;
-                    }
-                }
-                
-                // تطبيق مرشح تمرير منخفض
-                if (i > 0) {
-                    data[i] = data[i] * 0.8 + data[i-1] * 0.2;
-                }
-            }
-        }
-        
-        function applyRadioEffect(data, settings) {
-            // محاكاة تأثير الراديو القديم
-            for (let i = 0; i < data.length; i++) {
-                // تشويه
-                data[i] = Math.tanh(data[i] * settings.distortion * 3);
-                
-                // مرشح تمرير منخفض
-                if (i > 0) {
-                    data[i] = data[i] * 0.9 + data[i-1] * 0.1;
-                }
-                
-                // ضوضاء عشوائية
-                if (Math.random() < 0.001) {
-                    data[i] += (Math.random() - 0.5) * 0.1;
-                }
-            }
-        }
-        
-        function applyTelephoneEffect(data, settings) {
-            // محاكاة تأثير الهاتف
-            for (let i = 0; i < data.length; i++) {
-                // مرشح تمرير منخفض
-                if (i > 0) {
-                    data[i] = data[i] * 0.95 + data[i-1] * 0.05;
-                }
-                
-                // تقليل ديناميكية الصوت
-                data[i] = Math.sign(data[i]) * Math.min(Math.abs(data[i]), 0.3);
-            }
-        }
-        
-        function applyUnderwaterEffect(data, settings, sampleRate) {
-            // محاكاة تأثير تحت الماء
-            const delaySamples = Math.floor(settings.delay * sampleRate);
-            
-            for (let i = 0; i < data.length; i++) {
-                // صدى خفيف
-                if (i >= delaySamples) {
-                    data[i] += data[i - delaySamples] * 0.3;
-                }
-                
-                // مرشح تمرير منخفض قوي
-                if (i > 0) {
-                    data[i] = data[i] * 0.6 + data[i-1] * 0.4;
-                }
-                
-                // تقليل الترددات العالية
-                data[i] *= 0.8;
-            }
-        }
-        
-        function applyRobotEffect(data, settings) {
-            // محاكاة تأثير الروبوت
-            for (let i = 0; i < data.length; i++) {
-                // تشويه قوي
-                data[i] = Math.tanh(data[i] * settings.distortion * 5);
-                
-                // تغيير النغمة
-                if (i % 2 === 0 && i < data.length - 1) {
-                    data[i] = data[i] * settings.pitch;
-                }
-                
-                // إضافة ترددات منخفضة
-                if (i > 1) {
-                    data[i] += (data[i-1] + data[i-2]) * 0.1;
-                }
-            }
-        }
-        
-        function applyPitchEffect(data, pitch) {
+        function applyPitchShift(data, pitchFactor) {
             // تغيير نغمة الصوت
             for (let i = 0; i < data.length; i++) {
-                data[i] *= pitch;
+                const sourceIndex = Math.floor(i / pitchFactor);
+                if (sourceIndex < data.length) {
+                    data[i] = data[sourceIndex] * pitchFactor;
+                }
             }
+        }
+        
+        function applyFormantShift(data, formantFactor) {
+            // محاكاة تأثير الفورمات للصوت الأنثوي
+            for (let i = 1; i < data.length - 1; i++) {
+                // زيادة الترددات المتوسطة والعالية
+                data[i] = data[i] * (0.7 + 0.3 * formantFactor);
+                
+                // تقليل الترددات المنخفضة قليلاً
+                if (i > 1) {
+                    data[i] -= data[i-1] * 0.1 * (formantFactor - 1);
+                }
+            }
+        }
+        
+        function applyToneAdjustment(data, toneFactor) {
+            // تحسين نغمة الصوت
+            for (let i = 0; i < data.length; i++) {
+                data[i] = Math.tanh(data[i] * toneFactor * 1.5) * 0.8;
+            }
+        }
+        
+        function applyClarityAdjustment(data, clarityFactor) {
+            // تحسين وضوح الصوت
+            for (let i = 1; i < data.length - 1; i++) {
+                // تعزيز الحدة
+                data[i] = data[i] * clarityFactor + (data[i] - data[i-1]) * 0.1;
+                
+                // منع القص
+                if (data[i] > 0.95) data[i] = 0.95;
+                if (data[i] < -0.95) data[i] = -0.95;
+            }
+        }
+        
+        function getEffectName(effect) {
+            const names = {
+                'girl_young': 'فتاة صغيرة',
+                'girl_soft': 'ناعم',
+                'girl_confident': 'واثق',
+                'girl_sweet': 'حلو',
+                'girl_mature': 'ناضج',
+                'girl_energetic': 'نشيط',
+                'girl_gentle': 'رقيق',
+                'girl_playful': 'مرحة'
+            };
+            return names[effect] || 'بنت';
         }
         
         function downloadAudio() {
@@ -1176,7 +884,7 @@
             const url = URL.createObjectURL(wavBlob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `audio_${currentEffect}.wav`;
+            a.download = `صوت_بنت_${getEffectName(currentEffect)}.wav`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
