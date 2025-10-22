@@ -27,7 +27,7 @@
     <section class="hero">
         <div class="hero-content">
             <h1>اكتشف صوتك الجديد</h1>
-            <p>غير صوتك إلى صوت بنت بجودة عالية باستخدام أحدث تقنيات الذكاء الاصطناعي</p>
+            <p>غير صوتك إلى صوت بنت بجودة عالية باستخدام أحدث تقنيات معالجة الصوت</p>
             <button class="cta-btn" onclick="scrollToSection('voice-changer')">ابدأ الآن مجاناً</button>
         </div>
         <div class="hero-wave">
@@ -221,7 +221,9 @@
             <span class="close">&times;</span>
             <h3>تسجيل صوت جديد</h3>
             <div class="recorder">
-                <div id="waveform"></div>
+                <div class="recorder-visual">
+                    <canvas id="waveformCanvas" width="400" height="100"></canvas>
+                </div>
                 <div class="recorder-controls">
                     <button id="startRecord" class="record-btn">🎤 بدء التسجيل</button>
                     <button id="stopRecord" class="record-btn stop" disabled>⏹️ إيقاف</button>
@@ -234,6 +236,5 @@
     </div>
 
     <script src="script.js"></script>
-    <script src="voice-effects.js"></script>
 </body>
 </html>
