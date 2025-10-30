@@ -1,588 +1,113 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق رسم الصور باستخدام الكاميرا</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            min-height: 100vh;
-            padding: 20px;
-            direction: rtl;
-        }
-        
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .description {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 20px;
-        }
-        
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
-        
-        .upload-section, .camera-section {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        h2 {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-            padding-bottom: 10px;
-        }
-        
-        .upload-area {
-            border: 3px dashed rgba(255, 255, 255, 0.5);
-            border-radius: 15px;
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 20px;
-        }
-        
-        .upload-area:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.8);
-        }
-        
-        .upload-icon {
-            font-size: 60px;
-            margin-bottom: 15px;
-        }
-        
-        .upload-text {
-            font-size: 1.2rem;
-        }
-        
-        #fileInput {
-            display: none;
-        }
-        
-        .preview-container {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
-        }
-        
-        #imagePreview {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .control-group {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        label {
-            font-size: 1.1rem;
-            min-width: 120px;
-        }
-        
-        input[type="range"] {
-            flex: 1;
-            height: 10px;
-            border-radius: 5px;
-            background: rgba(255, 255, 255, 0.2);
-            outline: none;
-            -webkit-appearance: none;
-        }
-        
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: white;
-            cursor: pointer;
-        }
-        
-        .button {
-            background: linear-gradient(to right, #FF416C, #FF4B2B);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.1rem;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        .button:active {
-            transform: translateY(1px);
-        }
-        
-        .camera-container {
-            position: relative;
-            width: 100%;
-            height: 400px;
-            background: #000;
-            border-radius: 15px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        
-        #cameraVideo {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        #overlayCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-        
-        #drawingCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            cursor: crosshair;
-        }
-        
-        .drawing-controls {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-        
-        .color-option {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid white;
-        }
-        
-        .pen-size {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .instructions {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 30px;
-        }
-        
-        .instructions h3 {
-            margin-bottom: 10px;
-            font-size: 1.4rem;
-        }
-        
-        .instructions ol {
-            padding-right: 20px;
-            line-height: 1.6;
-        }
-        
-        .instructions li {
-            margin-bottom: 10px;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .camera-container {
-                height: 300px;
-            }
-            
-            .controls {
-                gap: 10px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تطبيق تتبع الرسم بالكاميرا</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      font-family: "Cairo", sans-serif;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100vh;
+    }
+
+    video, img {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      object-fit: cover;
+    }
+
+    #controls {
+      position: fixed;
+      bottom: 15px;
+      width: 90%;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      backdrop-filter: blur(8px);
+    }
+
+    input[type="file"] {
+      margin-bottom: 10px;
+      color: white;
+      background: #007bff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    label {
+      margin-top: 4px;
+      font-size: 14px;
+    }
+
+    #overlay {
+      display: none;
+      opacity: 0.5;
+      transition: opacity 0.2s ease;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>تطبيق رسم الصور باستخدام الكاميرا</h1>
-            <p class="description">ارفع صورتك، ثم استخدم الكاميرا لتتبع الرسمة بسهولة</p>
-        </header>
-        
-        <div class="app-container">
-            <section class="upload-section">
-                <h2>رفع الصورة</h2>
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📁</div>
-                    <p class="upload-text">انقر لرفع صورة أو اسحبها إلى هنا</p>
-                    <input type="file" id="fileInput" accept="image/*">
-                </div>
-                
-                <div class="preview-container" id="previewContainer">
-                    <img id="imagePreview" src="" alt="معاينة الصورة">
-                </div>
-                
-                <div class="controls">
-                    <div class="control-group">
-                        <label for="opacityControl">شفافية الصورة:</label>
-                        <input type="range" id="opacityControl" min="0" max="1" step="0.1" value="0.5">
-                        <span id="opacityValue">50%</span>
-                    </div>
-                    
-                    <button class="button" id="startCameraBtn">
-                        <span>تشغيل الكاميرا</span>
-                        <span>📷</span>
-                    </button>
-                </div>
-            </section>
-            
-            <section class="camera-section">
-                <h2>الكاميرا والرسم</h2>
-                <div class="camera-container">
-                    <video id="cameraVideo" autoplay playsinline></video>
-                    <canvas id="overlayCanvas"></canvas>
-                    <canvas id="drawingCanvas"></canvas>
-                </div>
-                
-                <div class="drawing-controls">
-                    <div class="pen-size">
-                        <label for="penSize">حجم القلم:</label>
-                        <input type="range" id="penSize" min="1" max="20" value="5">
-                    </div>
-                    
-                    <div class="color-options">
-                        <div class="color-option" style="background-color: #000000;" data-color="#000000"></div>
-                        <div class="color-option" style="background-color: #ff0000;" data-color="#ff0000"></div>
-                        <div class="color-option" style="background-color: #0000ff;" data-color="#0000ff"></div>
-                        <div class="color-option" style="background-color: #00ff00;" data-color="#00ff00"></div>
-                        <div class="color-option" style="background-color: #ffff00;" data-color="#ffff00"></div>
-                    </div>
-                    
-                    <button class="button" id="clearBtn">
-                        <span>مسح الرسم</span>
-                        <span>🧹</span>
-                    </button>
-                    
-                    <button class="button" id="saveBtn">
-                        <span>حفظ الرسم</span>
-                        <span>💾</span>
-                    </button>
-                </div>
-            </section>
-            
-            <div class="instructions">
-                <h3>كيفية الاستخدام:</h3>
-                <ol>
-                    <li>قم برفع الصورة التي تريد رسمها</li>
-                    <li>اضبط شفافية الصورة حسب احتياجك</li>
-                    <li>انقر على "تشغيل الكاميرا" للبدء</li>
-                    <li>ستظهر صورتك فوق الكاميرا لتتمكن من تتبعها</li>
-                    <li>استخدم القلم للرسم على الكاميرا</li>
-                    <li>يمكنك تغيير لون وحجم القلم حسب رغبتك</li>
-                    <li>انقر على "حفظ الرسم" لحفظ رسمتك النهائية</li>
-                </ol>
-            </div>
-        </div>
-    </div>
 
-    <script>
-        // العناصر الأساسية
-        const fileInput = document.getElementById('fileInput');
-        const uploadArea = document.getElementById('uploadArea');
-        const previewContainer = document.getElementById('previewContainer');
-        const imagePreview = document.getElementById('imagePreview');
-        const opacityControl = document.getElementById('opacityControl');
-        const opacityValue = document.getElementById('opacityValue');
-        const startCameraBtn = document.getElementById('startCameraBtn');
-        const cameraVideo = document.getElementById('cameraVideo');
-        const overlayCanvas = document.getElementById('overlayCanvas');
-        const overlayCtx = overlayCanvas.getContext('2d');
-        const drawingCanvas = document.getElementById('drawingCanvas');
-        const drawingCtx = drawingCanvas.getContext('2d');
-        const penSize = document.getElementById('penSize');
-        const colorOptions = document.querySelectorAll('.color-option');
-        const clearBtn = document.getElementById('clearBtn');
-        const saveBtn = document.getElementById('saveBtn');
-        
-        // متغيرات التطبيق
-        let uploadedImage = null;
-        let isDrawing = false;
-        let currentColor = '#000000';
-        let currentPenSize = 5;
-        
-        // رفع الصورة
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
-        });
-        
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.style.background = 'rgba(255, 255, 255, 0.2)';
-        });
-        
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.style.background = '';
-        });
-        
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.style.background = '';
-            
-            if (e.dataTransfer.files.length) {
-                fileInput.files = e.dataTransfer.files;
-                handleImageUpload();
-            }
-        });
-        
-        fileInput.addEventListener('change', handleImageUpload);
-        
-        function handleImageUpload() {
-            const file = fileInput.files[0];
-            if (file) {
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
-                    previewContainer.style.display = 'block';
-                    
-                    uploadedImage = new Image();
-                    uploadedImage.onload = function() {
-                        drawOverlayImage();
-                    };
-                    uploadedImage.src = e.target.result;
-                };
-                
-                reader.readAsDataURL(file);
-            }
-        }
-        
-        // التحكم في الشفافية
-        opacityControl.addEventListener('input', () => {
-            const opacity = opacityControl.value;
-            opacityValue.textContent = Math.round(opacity * 100) + '%';
-            drawOverlayImage();
-        });
-        
-        function drawOverlayImage() {
-            if (!uploadedImage) return;
-            
-            const width = overlayCanvas.width;
-            const height = overlayCanvas.height;
-            
-            overlayCtx.clearRect(0, 0, width, height);
-            overlayCtx.globalAlpha = opacityControl.value;
-            overlayCtx.drawImage(uploadedImage, 0, 0, width, height);
-            overlayCtx.globalAlpha = 1;
-        }
-        
-        // تشغيل الكاميرا
-        startCameraBtn.addEventListener('click', startCamera);
-        
-        function startCamera() {
-            if (!uploadedImage) {
-                alert('يرجى رفع صورة أولاً');
-                return;
-            }
-            
-            // ضبط أبعاد الـ Canvas
-            const container = document.querySelector('.camera-container');
-            overlayCanvas.width = container.clientWidth;
-            overlayCanvas.height = container.clientHeight;
-            drawingCanvas.width = container.clientWidth;
-            drawingCanvas.height = container.clientHeight;
-            
-            // رسم الصورة على الـ Canvas
-            drawOverlayImage();
-            
-            // تشغيل الكاميرا
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(function(stream) {
-                        cameraVideo.srcObject = stream;
-                    })
-                    .catch(function(error) {
-                        console.error('خطأ في تشغيل الكاميرا:', error);
-                        alert('تعذر الوصول إلى الكاميرا. يرجى التأكد من السماح باستخدام الكاميرا.');
-                    });
-            } else {
-                alert('المتصفح لا يدعم الوصول إلى الكاميرا');
-            }
-        }
-        
-        // الرسم على Canvas
-        drawingCanvas.addEventListener('mousedown', startDrawing);
-        drawingCanvas.addEventListener('touchstart', startDrawing);
-        
-        drawingCanvas.addEventListener('mousemove', draw);
-        drawingCanvas.addEventListener('touchmove', draw);
-        
-        drawingCanvas.addEventListener('mouseup', stopDrawing);
-        drawingCanvas.addEventListener('touchend', stopDrawing);
-        drawingCanvas.addEventListener('mouseout', stopDrawing);
-        
-        function startDrawing(e) {
-            isDrawing = true;
-            draw(e);
-        }
-        
-        function draw(e) {
-            if (!isDrawing) return;
-            
-            e.preventDefault();
-            
-            const rect = drawingCanvas.getBoundingClientRect();
-            let x, y;
-            
-            if (e.type.includes('mouse')) {
-                x = e.clientX - rect.left;
-                y = e.clientY - rect.top;
-            } else {
-                x = e.touches[0].clientX - rect.left;
-                y = e.touches[0].clientY - rect.top;
-            }
-            
-            drawingCtx.lineWidth = currentPenSize;
-            drawingCtx.lineCap = 'round';
-            drawingCtx.strokeStyle = currentColor;
-            
-            drawingCtx.lineTo(x, y);
-            drawingCtx.stroke();
-            drawingCtx.beginPath();
-            drawingCtx.moveTo(x, y);
-        }
-        
-        function stopDrawing() {
-            isDrawing = false;
-            drawingCtx.beginPath();
-        }
-        
-        // تغيير لون القلم
-        colorOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                currentColor = option.getAttribute('data-color');
-                
-                // إزالة التحديد من جميع الألوان
-                colorOptions.forEach(opt => {
-                    opt.style.border = '2px solid white';
-                });
-                
-                // إضافة حد أوسع للون المحدد
-                option.style.border = '4px solid white';
-            });
-        });
-        
-        // تغيير حجم القلم
-        penSize.addEventListener('input', () => {
-            currentPenSize = penSize.value;
-        });
-        
-        // مسح الرسم
-        clearBtn.addEventListener('click', () => {
-            drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-        });
-        
-        // حفظ الرسم
-        saveBtn.addEventListener('click', () => {
-            // إنشاء canvas مؤقت لدمج الرسم مع الكاميرا
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = drawingCanvas.width;
-            tempCanvas.height = drawingCanvas.height;
-            const tempCtx = tempCanvas.getContext('2d');
-            
-            // رسم فيديو الكاميرا أولاً
-            tempCtx.drawImage(cameraVideo, 0, 0, tempCanvas.width, tempCanvas.height);
-            
-            // ثم رسم الصورة الشفافة
-            tempCtx.globalAlpha = 0.5;
-            tempCtx.drawImage(overlayCanvas, 0, 0);
-            tempCtx.globalAlpha = 1;
-            
-            // ثم رسم الـ drawing
-            tempCtx.drawImage(drawingCanvas, 0, 0);
-            
-            // تحويل إلى صورة وحفظها
-            const dataURL = tempCanvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.download = 'رسمتي.png';
-            link.href = dataURL;
-            link.click();
-        });
-        
-        // ضبط أبعاد Canvas عند تغيير حجم النافذة
-        window.addEventListener('resize', () => {
-            if (uploadedImage) {
-                const container = document.querySelector('.camera-container');
-                overlayCanvas.width = container.clientWidth;
-                overlayCanvas.height = container.clientHeight;
-                drawingCanvas.width = container.clientWidth;
-                drawingCanvas.height = container.clientHeight;
-                
-                drawOverlayImage();
-            }
-        });
-    </script>
+  <video id="camera" autoplay playsinline></video>
+  <img id="overlay" alt="الصورة المرفوعة">
+  
+  <div id="controls">
+    <input type="file" id="upload" accept="image/*">
+    <label for="opacity">تحكم في الشفافية</label>
+    <input type="range" id="opacity" min="0" max="1" step="0.1" value="0.5">
+  </div>
+
+  <script>
+    const video = document.getElementById('camera');
+    const overlay = document.getElementById('overlay');
+    const upload = document.getElementById('upload');
+    const opacitySlider = document.getElementById('opacity');
+
+    // تشغيل الكاميرا
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        video.srcObject = stream;
+      } catch (err) {
+        alert("حدث خطأ أثناء تشغيل الكاميرا: " + err.message);
+      }
+    }
+
+    // تحميل الصورة
+    upload.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (file) {
+        overlay.src = URL.createObjectURL(file);
+        overlay.style.display = 'block';
+      }
+    });
+
+    // التحكم في الشفافية
+    opacitySlider.addEventListener('input', e => {
+      overlay.style.opacity = e.target.value;
+    });
+
+    // تشغيل الكاميرا عند تحميل الصفحة
+    startCamera();
+  </script>
 </body>
 </html>
