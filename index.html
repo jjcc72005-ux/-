@@ -3,80 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zidan Trace | ارسم بخيالك</title>
+<title>Zidan Trace | فن الرسم الذهبي</title>
 <style>
   body {
     margin: 0;
     font-family: "Cairo", sans-serif;
-    background: radial-gradient(circle at center, #0d0d0d 40%, #000 100%);
-    color: #fff;
+    background: radial-gradient(circle at center, #000 60%, #111 100%);
+    color: #ffd700;
     overflow: hidden;
+    user-select: none;
   }
 
   /* شاشة البداية */
   #splash {
     position: fixed;
     inset: 0;
+    background: #000;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: #000;
     z-index: 9999;
     animation: fadeOut 1s ease 3s forwards;
   }
   @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
 
-  #splash svg {
-    width: 120px;
-    height: 120px;
-    stroke: #00c8ff;
-    fill: none;
-    stroke-width: 2;
-    stroke-dasharray: 500;
-    stroke-dashoffset: 500;
-    animation: draw 3s ease forwards;
+  #splash .pen {
+    width: 100px;
+    height: 100px;
+    position: relative;
   }
 
-  @keyframes draw {
-    to { stroke-dashoffset: 0; }
+  #splash .pen::before {
+    content: "✒️";
+    font-size: 60px;
+    position: absolute;
+    left: 20px;
+    animation: drawName 3s ease forwards;
+  }
+
+  @keyframes drawName {
+    0% { opacity: 0; transform: translateX(-50px); }
+    50% { opacity: 1; transform: translateX(0); }
+    100% { transform: translateX(50px); }
   }
 
   #splash h1 {
-    margin-top: 20px;
-    font-size: 28px;
-    color: #00c8ff;
-    letter-spacing: 2px;
+    margin-top: 25px;
+    font-size: 32px;
+    background: linear-gradient(90deg, #ffd700, #ffcc33);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 3px;
   }
 
-  /* الواجهة الرئيسية */
-  #main {
-    position: fixed;
-    inset: 0;
-    background: transparent;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  #startBtn {
-    background: #00c8ff;
-    color: #000;
-    border: none;
-    padding: 15px 40px;
-    border-radius: 12px;
-    font-size: 18px;
-    cursor: pointer;
-    box-shadow: 0 0 15px #00c8ff77;
-    transition: 0.3s;
-  }
-
-  #startBtn:hover {
-    transform: scale(1.05);
-  }
-
+  /* الكاميرا */
   video {
     width: 100vw;
     height: 100vh;
@@ -84,9 +65,40 @@
     position: fixed;
     top: 0;
     left: 0;
-    z-index: -2;
+    z-index: -3;
   }
 
+  /* الواجهة الرئيسية */
+  #main {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px);
+    z-index: 5;
+  }
+
+  #startBtn {
+    background: linear-gradient(45deg, #ffd700, #ffae00);
+    color: #000;
+    border: none;
+    padding: 18px 50px;
+    border-radius: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 0 25px #ffd70080;
+    transition: all 0.3s ease;
+  }
+
+  #startBtn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 35px #ffd700aa;
+  }
+
+  /* طبقة الصورة */
   #overlay {
     position: fixed;
     inset: 0;
@@ -101,61 +113,67 @@
     position: absolute;
     max-width: 90%;
     max-height: 80%;
-    opacity: 0.5;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    border-radius: 12px;
-    box-shadow: 0 0 30px #00c8ff44;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    opacity: 0.8;
+    filter: brightness(1.2) contrast(1.2);
+    box-shadow: 0 0 40px #ffd70033;
   }
 
   #controls {
     position: fixed;
     bottom: 20px;
-    width: 90%;
+    width: 95%;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0,0,0,0.6);
-    border-radius: 15px;
-    padding: 10px;
     display: flex;
     justify-content: space-around;
-    align-items: center;
     flex-wrap: wrap;
     gap: 10px;
   }
 
-  input[type="range"] {
-    width: 100px;
-    accent-color: #00c8ff;
-  }
-
   .btn {
-    background: #00c8ff;
+    background: radial-gradient(circle at top, #ffd700, #b8860b);
     border: none;
     color: #000;
-    padding: 10px 18px;
-    border-radius: 10px;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 50px;
     cursor: pointer;
-    font-size: 14px;
-    transition: 0.3s;
+    box-shadow: 0 0 15px #ffd70066;
+    transition: all 0.3s;
   }
 
   .btn:hover {
-    transform: scale(1.1);
+    transform: scale(1.15);
   }
 
   input[type="file"] {
     display: none;
   }
 
+  input[type="range"] {
+    accent-color: #ffd700;
+  }
+
+  #focusBtn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #00000088;
+    color: #ffd700;
+    border: 1px solid #ffd70055;
+    padding: 8px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
 </style>
 </head>
 <body>
 
-<!-- شاشة التحميل -->
+<!-- شاشة البداية -->
 <div id="splash">
-  <svg viewBox="0 0 100 100">
-    <path d="M50 10 Q40 20 30 40 Q50 60 70 40 Q60 20 50 10Z" />
-  </svg>
+  <div class="pen"></div>
   <h1>Zidan Trace</h1>
 </div>
 
@@ -164,22 +182,23 @@
 
 <!-- واجهة البداية -->
 <div id="main">
-  <button id="startBtn">ابدأ الرسم ✏️</button>
+  <button id="startBtn">ابدأ الإبداع ✨</button>
 </div>
 
-<!-- طبقة الصورة -->
+<!-- الطبقة الرئيسية -->
 <div id="overlay">
   <img id="uploadedImg" src="" alt="">
   <div id="controls">
     <label class="btn">
-      اختر صورة
-      <input type="file" id="fileInput" accept="image/*">
+      📁 صورة<input type="file" id="fileInput" accept="image/*">
     </label>
-    <button class="btn" id="flipBtn">تبديل الكاميرا</button>
-    <button class="btn" id="lockBtn">قفل الصورة</button>
-    <label>الشفافية<input type="range" id="opacityRange" min="0.1" max="1" step="0.05" value="0.5"></label>
-    <label>الحجم<input type="range" id="sizeRange" min="0.5" max="2" step="0.1" value="1"></label>
+    <button class="btn" id="flipBtn">🔄</button>
+    <button class="btn" id="highBtn">☀️ وضوح عالي</button>
+    <button class="btn" id="lockBtn">🔒</button>
+    <label>شفافية<input type="range" id="opacityRange" min="0.3" max="1" step="0.05" value="0.8"></label>
+    <label>حجم<input type="range" id="sizeRange" min="0.5" max="2" step="0.1" value="1"></label>
   </div>
+  <button id="focusBtn">🎯 وضع التركيز</button>
 </div>
 
 <script>
@@ -192,8 +211,11 @@ let opacityRange = document.getElementById('opacityRange');
 let sizeRange = document.getElementById('sizeRange');
 let flipBtn = document.getElementById('flipBtn');
 let lockBtn = document.getElementById('lockBtn');
+let focusBtn = document.getElementById('focusBtn');
+let highBtn = document.getElementById('highBtn');
 
 let locked = false;
+let focusMode = false;
 let usingFrontCamera = false;
 
 async function startCamera() {
@@ -241,7 +263,19 @@ flipBtn.onclick = () => {
 lockBtn.onclick = () => {
   locked = !locked;
   uploadedImg.style.pointerEvents = locked ? 'none' : 'auto';
-  lockBtn.textContent = locked ? "🔒 الصورة مقفولة" : "قفل الصورة";
+  lockBtn.textContent = locked ? "✅ مقفولة" : "🔒";
+};
+
+focusBtn.onclick = () => {
+  focusMode = !focusMode;
+  document.getElementById('controls').style.display = focusMode ? 'none' : 'flex';
+  focusBtn.textContent = focusMode ? "👁️ خروج التركيز" : "🎯 وضع التركيز";
+};
+
+highBtn.onclick = () => {
+  uploadedImg.style.filter = "brightness(1.5) contrast(1.5)";
+  uploadedImg.style.opacity = 0.95;
+  highBtn.textContent = "☀️ تم التوضيح";
 };
 </script>
 
