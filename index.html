@@ -3,18 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تطبيق تتبع الرسم بالكاميرا</title>
+  <title>AR Tracer | تتبع الرسم بالكاميرا</title>
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       overflow: hidden;
       background: #000;
       font-family: "Cairo", sans-serif;
       color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
       height: 100vh;
     }
 
@@ -28,29 +25,37 @@
     #overlay {
       display: none;
       opacity: 0.5;
-      transition: opacity 0.2s ease, transform 0.3s ease;
       object-fit: contain;
+      transform: translate(-50%, -50%) scale(1);
+      top: 50%;
+      left: 50%;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      transition: opacity 0.3s ease;
     }
 
     #controls {
       position: fixed;
-      bottom: 15px;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
       width: 90%;
-      background: rgba(0, 0, 0, 0.6);
-      padding: 10px;
-      border-radius: 12px;
+      background: rgba(0,0,0,0.65);
+      padding: 12px;
+      border-radius: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      backdrop-filter: blur(6px);
+      gap: 6px;
+      backdrop-filter: blur(8px);
     }
 
-    input[type="file"] {
-      margin-bottom: 10px;
+    input[type="file"], button {
       color: white;
       background: #007bff;
       border: none;
-      padding: 8px 14px;
+      padding: 10px 16px;
       border-radius: 10px;
       cursor: pointer;
       font-size: 16px;
@@ -58,11 +63,13 @@
 
     input[type="range"] {
       width: 100%;
+      cursor: pointer;
     }
 
-    label {
-      margin-top: 4px;
-      font-size: 14px;
+    label { font-size: 14px; }
+
+    button:hover {
+      background: #0059c8;
     }
   </style>
 </head>
@@ -70,13 +77,15 @@
 
   <video id="camera" autoplay playsinline></video>
   <img id="overlay" alt="الصورة المرفوعة">
-  
+
   <div id="controls">
     <input type="file" id="upload" accept="image/*">
-    <label for="opacity">شفافية الصورة</label>
+    <button id="switchCam">تبديل الكاميرا 🔄</button>
+    
+    <label>شفافية الصورة</label>
     <input type="range" id="opacity" min="0" max="1" step="0.1" value="0.5">
 
-    <label for="scale">حجم الصورة</label>
+    <label>تكبير/تصغير</label>
     <input type="range" id="scale" min="0.5" max="2" step="0.1" value="1">
   </div>
 
@@ -86,44 +95,106 @@
     const upload = document.getElementById('upload');
     const opacitySlider = document.getElementById('opacity');
     const scaleSlider = document.getElementById('scale');
+    const switchBtn = document.getElementById('switchCam');
 
-    // تشغيل الكاميرا الخلفية
+    let stream;
+    let facingMode = "environment";
+    let scale = 1, posX = 0, posY = 0, startX, startY, isDragging = false;
+
+    // ✅ تشغيل الكاميرا
     async function startCamera() {
+      if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+      }
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
         video.srcObject = stream;
       } catch (err) {
-        alert("حدث خطأ أثناء تشغيل الكاميرا: " + err.message);
+        alert("لا يمكن تشغيل الكاميرا: " + err.message);
       }
     }
 
-    // تحميل الصورة وعرضها فوق الكاميرا
+    // 🔁 تبديل الكاميرا
+    switchBtn.addEventListener('click', () => {
+      facingMode = (facingMode === "environment") ? "user" : "environment";
+      startCamera();
+    });
+
+    // 📤 تحميل الصورة
     upload.addEventListener('change', e => {
       const file = e.target.files[0];
       if (file) {
         overlay.src = URL.createObjectURL(file);
         overlay.style.display = 'block';
-        overlay.style.transform = 'translate(-50%, -50%) scale(1)';
-        overlay.style.top = '50%';
-        overlay.style.left = '50%';
-        overlay.style.width = 'auto';
-        overlay.style.height = '80vh';
-        overlay.style.position = 'absolute';
+        saveSettings();
       }
     });
 
-    // التحكم في الشفافية
+    // ✏️ التحكم في الشفافية
     opacitySlider.addEventListener('input', e => {
       overlay.style.opacity = e.target.value;
+      saveSettings();
     });
 
-    // التحكم في الحجم (تكبير/تصغير)
+    // 🔍 التحكم في التكبير
     scaleSlider.addEventListener('input', e => {
-      overlay.style.transform = `translate(-50%, -50%) scale(${e.target.value})`;
+      scale = e.target.value;
+      updateTransform();
+      saveSettings();
     });
 
-    // تشغيل الكاميرا عند تحميل الصفحة
+    // 🖐️ السحب (تحريك الصورة)
+    overlay.addEventListener('pointerdown', e => {
+      isDragging = true;
+      startX = e.clientX - posX;
+      startY = e.clientY - posY;
+      overlay.setPointerCapture(e.pointerId);
+    });
+
+    overlay.addEventListener('pointermove', e => {
+      if (!isDragging) return;
+      posX = e.clientX - startX;
+      posY = e.clientY - startY;
+      updateTransform();
+    });
+
+    overlay.addEventListener('pointerup', e => {
+      isDragging = false;
+      saveSettings();
+    });
+
+    function updateTransform() {
+      overlay.style.transform = `translate(calc(-50% + ${posX}px), calc(-50% + ${posY}px)) scale(${scale})`;
+    }
+
+    // 💾 حفظ الإعدادات في LocalStorage
+    function saveSettings() {
+      const settings = {
+        opacity: opacitySlider.value,
+        scale,
+        posX,
+        posY
+      };
+      localStorage.setItem("tracerSettings", JSON.stringify(settings));
+    }
+
+    // ♻️ استرجاع الإعدادات
+    function loadSettings() {
+      const saved = localStorage.getItem("tracerSettings");
+      if (!saved) return;
+      const { opacity, scale: s, posX: x, posY: y } = JSON.parse(saved);
+      opacitySlider.value = opacity;
+      scaleSlider.value = s;
+      scale = s;
+      posX = x;
+      posY = y;
+      overlay.style.opacity = opacity;
+      updateTransform();
+    }
+
+    // 🚀 تشغيل الكاميرا عند التحميل
     startCamera();
+    loadSettings();
   </script>
 </body>
 </html>
