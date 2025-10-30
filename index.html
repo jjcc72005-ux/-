@@ -3,241 +3,586 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صوتي الجديد - تغيير الأصوات الحقيقي</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <!-- أضف هذا قبل </head> -->
-<script src="https://cdn.jsdelivr.net/npm/soundtouchjs@0.1.0/dist/soundtouch.min.js"></script>
-<script src="https://unpkg.com/pitch-shift@latest/dist/pitch-shift.min.js"></script>
+    <title>تطبيق رسم الصور باستخدام الكاميرا</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .description {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .upload-section, .camera-section {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+        }
+        
+        .upload-area {
+            border: 3px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .upload-area:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .upload-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            font-size: 1.2rem;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .preview-container {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        #imagePreview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        label {
+            font-size: 1.1rem;
+            min-width: 120px;
+        }
+        
+        input[type="range"] {
+            flex: 1;
+            height: 10px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .button {
+            background: linear-gradient(to right, #FF416C, #FF4B2B);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .button:active {
+            transform: translateY(1px);
+        }
+        
+        .camera-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        #cameraVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        #overlayCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        #drawingCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+        
+        .drawing-controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+        
+        .pen-size {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+        }
+        
+        .instructions ol {
+            padding-right: 20px;
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .camera-container {
+                height: 300px;
+            }
+            
+            .controls {
+                gap: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <nav>
-            <div class="logo">
-                <h1>🎵 صوتي <span>الجديد</span></h1>
-            </div>
-            <div class="nav-links">
-                <a href="#voice-changer">تغيير الصوت</a>
-                <a href="#voices">الأصوات</a>
-                <a href="#how-to-use">كيفية الاستخدام</a>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>اكتشف صوتك الجديد</h1>
-            <p>غير صوتك إلى صوت بنت بجودة عالية باستخدام أحدث تقنيات معالجة الصوت</p>
-            <button class="cta-btn" onclick="scrollToSection('voice-changer')">ابدأ الآن مجاناً</button>
-        </div>
-        <div class="hero-wave">
-            <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-                <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" class="shape-fill"></path>
-                <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" class="shape-fill"></path>
-                <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" class="shape-fill"></path>
-            </svg>
-        </div>
-    </section>
-
-    <!-- Voice Changer Section -->
-    <section id="voice-changer" class="voice-changer">
-        <div class="container">
-            <h2 class="section-title">غير صوتك في خطوات بسيطة</h2>
+    <div class="container">
+        <header>
+            <h1>تطبيق رسم الصور باستخدام الكاميرا</h1>
+            <p class="description">ارفع صورتك، ثم استخدم الكاميرا لتتبع الرسمة بسهولة</p>
+        </header>
+        
+        <div class="app-container">
+            <section class="upload-section">
+                <h2>رفع الصورة</h2>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <p class="upload-text">انقر لرفع صورة أو اسحبها إلى هنا</p>
+                    <input type="file" id="fileInput" accept="image/*">
+                </div>
+                
+                <div class="preview-container" id="previewContainer">
+                    <img id="imagePreview" src="" alt="معاينة الصورة">
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="opacityControl">شفافية الصورة:</label>
+                        <input type="range" id="opacityControl" min="0" max="1" step="0.1" value="0.5">
+                        <span id="opacityValue">50%</span>
+                    </div>
+                    
+                    <button class="button" id="startCameraBtn">
+                        <span>تشغيل الكاميرا</span>
+                        <span>📷</span>
+                    </button>
+                </div>
+            </section>
             
-            <!-- Step 1: Upload/Record -->
-            <div class="step active" id="step1">
-                <div class="step-header">
-                    <div class="step-number">1</div>
-                    <h3>رفع أو تسجيل الصوت</h3>
+            <section class="camera-section">
+                <h2>الكاميرا والرسم</h2>
+                <div class="camera-container">
+                    <video id="cameraVideo" autoplay playsinline></video>
+                    <canvas id="overlayCanvas"></canvas>
+                    <canvas id="drawingCanvas"></canvas>
                 </div>
-                <div class="step-content">
-                    <div class="upload-options">
-                        <div class="upload-option" id="uploadOption">
-                            <div class="option-icon">📁</div>
-                            <h4>رفع ملف صوتي</h4>
-                            <p>MP3, WAV, M4A حتى 10MB</p>
-                            <input type="file" id="audioFile" accept="audio/*" hidden>
-                        </div>
-                        
-                        <div class="upload-option" id="recordOption">
-                            <div class="option-icon">🎤</div>
-                            <h4>تسجيل صوت جديد</h4>
-                            <p>سجل صوتك مباشرة من الميكروفون</p>
-                        </div>
+                
+                <div class="drawing-controls">
+                    <div class="pen-size">
+                        <label for="penSize">حجم القلم:</label>
+                        <input type="range" id="penSize" min="1" max="20" value="5">
                     </div>
                     
-                    <div id="audioPreview" class="audio-preview" style="display: none;">
-                        <h4>معاينة الصوت الأصلي</h4>
-                        <audio id="originalAudio" controls></audio>
-                        <button onclick="removeAudio()" class="remove-btn">إزالة الصوت</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 2: Voice Selection -->
-            <div class="step" id="step2">
-                <div class="step-header">
-                    <div class="step-number">2</div>
-                    <h3>اختر صوت البنت المناسب</h3>
-                </div>
-                <div class="step-content">
-                    <div class="voice-options">
-                        <div class="voice-option active" data-effect="soft">
-                            <div class="voice-icon">👩‍💼</div>
-                            <h4>صوت ناعم</h4>
-                            <p>صوت أنثوي ناعم وجذاب</p>
-                            <div class="voice-demo">
-                                <button class="demo-btn" onclick="playDemo('soft')">▶️ معاينة</button>
-                            </div>
-                        </div>
-                        
-                        <div class="voice-option" data-effect="singer">
-                            <div class="voice-icon">👩‍🎤</div>
-                            <h4>صوت مغنية</h4>
-                            <p>صوت واضح وموسيقي</p>
-                            <div class="voice-demo">
-                                <button class="demo-btn" onclick="playDemo('singer')">▶️ معاينة</button>
-                            </div>
-                        </div>
-                        
-                        <div class="voice-option" data-effect="young">
-                            <div class="voice-icon">👩‍🎓</div>
-                            <h4>صوت شابة</h4>
-                            <p>صوت حيوي ومعاصر</p>
-                            <div class="voice-demo">
-                                <button class="demo-btn" onclick="playDemo('young')">▶️ معاينة</button>
-                            </div>
-                        </div>
-                        
-                        <div class="voice-option" data-effect="elegant">
-                            <div class="voice-icon">👸</div>
-                            <h4>صوت أنيق</h4>
-                            <p>صوت راقي ومهذب</p>
-                            <div class="voice-demo">
-                                <button class="demo-btn" onclick="playDemo('elegant')">▶️ معاينة</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 3: Processing -->
-            <div class="step" id="step3">
-                <div class="step-header">
-                    <div class="step-number">3</div>
-                    <h3>معالجة الصوت</h3>
-                </div>
-                <div class="step-content">
-                    <div id="processing" style="display: none;">
-                        <div class="processing-animation">
-                            <div class="wave"></div>
-                            <div class="wave"></div>
-                            <div class="wave"></div>
-                        </div>
-                        <p>جاري معالجة الصوت وتحويله إلى صوت بنت...</p>
-                        <div class="progress-bar">
-                            <div class="progress"></div>
-                        </div>
+                    <div class="color-options">
+                        <div class="color-option" style="background-color: #000000;" data-color="#000000"></div>
+                        <div class="color-option" style="background-color: #ff0000;" data-color="#ff0000"></div>
+                        <div class="color-option" style="background-color: #0000ff;" data-color="#0000ff"></div>
+                        <div class="color-option" style="background-color: #00ff00;" data-color="#00ff00"></div>
+                        <div class="color-option" style="background-color: #ffff00;" data-color="#ffff00"></div>
                     </div>
                     
-                    <div id="result" style="display: none;">
-                        <h4>الصوت بعد التغيير</h4>
-                        <audio id="modifiedAudio" controls></audio>
-                        <div class="result-actions">
-                            <button onclick="downloadAudio()" class="download-btn">📥 تحميل الصوت</button>
-                            <button onclick="processAgain()" class="again-btn">🔄 معالجة أخرى</button>
-                        </div>
-                    </div>
+                    <button class="button" id="clearBtn">
+                        <span>مسح الرسم</span>
+                        <span>🧹</span>
+                    </button>
+                    
+                    <button class="button" id="saveBtn">
+                        <span>حفظ الرسم</span>
+                        <span>💾</span>
+                    </button>
                 </div>
+            </section>
+            
+            <div class="instructions">
+                <h3>كيفية الاستخدام:</h3>
+                <ol>
+                    <li>قم برفع الصورة التي تريد رسمها</li>
+                    <li>اضبط شفافية الصورة حسب احتياجك</li>
+                    <li>انقر على "تشغيل الكاميرا" للبدء</li>
+                    <li>ستظهر صورتك فوق الكاميرا لتتمكن من تتبعها</li>
+                    <li>استخدم القلم للرسم على الكاميرا</li>
+                    <li>يمكنك تغيير لون وحجم القلم حسب رغبتك</li>
+                    <li>انقر على "حفظ الرسم" لحفظ رسمتك النهائية</li>
+                </ol>
             </div>
-
-            <!-- Navigation -->
-            <div class="step-navigation">
-                <button id="prevBtn" class="nav-btn" onclick="previousStep()" disabled>السابق</button>
-                <button id="nextBtn" class="nav-btn primary" onclick="nextStep()">التالي</button>
-                <button id="processBtn" class="nav-btn primary" onclick="processAudio()" style="display: none;">معالجة الصوت</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section id="voices" class="features">
-        <div class="container">
-            <h2 class="section-title">أصوات بنات متنوعة</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🎭</div>
-                    <h3>أصوات واقعية</h3>
-                    <p>أصوات طبيعية لا يمكن تمييزها عن الأصوات الحقيقية</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3>معالجة فورية</h3>
-                    <p>تحويل صوتك في ثوانٍ معدودة بجودة عالية</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔒</div>
-                    <h3>آمن وخاص</h3>
-                    <p>جميع عمليات المعالجة تتم على جهازك دون تخزين</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How to Use -->
-    <section id="how-to-use" class="how-to-use">
-        <div class="container">
-            <h2 class="section-title">كيفية الاستخدام</h2>
-            <div class="steps">
-                <div class="usage-step">
-                    <div class="step-number">1</div>
-                    <h3>رفع الصوت</h3>
-                    <p>قم برفع ملف صوتي أو سجل صوتك مباشرة</p>
-                </div>
-                <div class="usage-step">
-                    <div class="step-number">2</div>
-                    <h3>اختيار الصوت</h3>
-                    <p>اختر من بين مجموعة أصوات البنات المتنوعة</p>
-                </div>
-                <div class="usage-step">
-                    <div class="step-number">3</div>
-                    <h3>المعالجة والتحميل</h3>
-                    <p>قم بمعالجة الصوت وتحميل النسخة المعدلة</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 صوتي الجديد. جميع الحقوق محفوظة.</p>
-        </div>
-    </footer>
-
-    <!-- Recording Modal -->
-    <div id="recordModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h3>تسجيل صوت جديد</h3>
-            <div class="recorder">
-                <div class="recorder-visual">
-                    <canvas id="waveformCanvas" width="400" height="100"></canvas>
-                </div>
-                <div class="recorder-controls">
-                    <button id="startRecord" class="record-btn">🎤 بدء التسجيل</button>
-                    <button id="stopRecord" class="record-btn stop" disabled>⏹️ إيقاف</button>
-                    <button id="playRecord" class="record-btn" disabled>▶️ تشغيل</button>
-                </div>
-                <div class="timer">00:00</div>
-            </div>
-            <button id="useRecording" class="use-btn" disabled>استخدام هذا التسجيل</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // العناصر الأساسية
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const previewContainer = document.getElementById('previewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const opacityControl = document.getElementById('opacityControl');
+        const opacityValue = document.getElementById('opacityValue');
+        const startCameraBtn = document.getElementById('startCameraBtn');
+        const cameraVideo = document.getElementById('cameraVideo');
+        const overlayCanvas = document.getElementById('overlayCanvas');
+        const overlayCtx = overlayCanvas.getContext('2d');
+        const drawingCanvas = document.getElementById('drawingCanvas');
+        const drawingCtx = drawingCanvas.getContext('2d');
+        const penSize = document.getElementById('penSize');
+        const colorOptions = document.querySelectorAll('.color-option');
+        const clearBtn = document.getElementById('clearBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        
+        // متغيرات التطبيق
+        let uploadedImage = null;
+        let isDrawing = false;
+        let currentColor = '#000000';
+        let currentPenSize = 5;
+        
+        // رفع الصورة
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.background = 'rgba(255, 255, 255, 0.2)';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.background = '';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.background = '';
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleImageUpload();
+            }
+        });
+        
+        fileInput.addEventListener('change', handleImageUpload);
+        
+        function handleImageUpload() {
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                    
+                    uploadedImage = new Image();
+                    uploadedImage.onload = function() {
+                        drawOverlayImage();
+                    };
+                    uploadedImage.src = e.target.result;
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // التحكم في الشفافية
+        opacityControl.addEventListener('input', () => {
+            const opacity = opacityControl.value;
+            opacityValue.textContent = Math.round(opacity * 100) + '%';
+            drawOverlayImage();
+        });
+        
+        function drawOverlayImage() {
+            if (!uploadedImage) return;
+            
+            const width = overlayCanvas.width;
+            const height = overlayCanvas.height;
+            
+            overlayCtx.clearRect(0, 0, width, height);
+            overlayCtx.globalAlpha = opacityControl.value;
+            overlayCtx.drawImage(uploadedImage, 0, 0, width, height);
+            overlayCtx.globalAlpha = 1;
+        }
+        
+        // تشغيل الكاميرا
+        startCameraBtn.addEventListener('click', startCamera);
+        
+        function startCamera() {
+            if (!uploadedImage) {
+                alert('يرجى رفع صورة أولاً');
+                return;
+            }
+            
+            // ضبط أبعاد الـ Canvas
+            const container = document.querySelector('.camera-container');
+            overlayCanvas.width = container.clientWidth;
+            overlayCanvas.height = container.clientHeight;
+            drawingCanvas.width = container.clientWidth;
+            drawingCanvas.height = container.clientHeight;
+            
+            // رسم الصورة على الـ Canvas
+            drawOverlayImage();
+            
+            // تشغيل الكاميرا
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                        cameraVideo.srcObject = stream;
+                    })
+                    .catch(function(error) {
+                        console.error('خطأ في تشغيل الكاميرا:', error);
+                        alert('تعذر الوصول إلى الكاميرا. يرجى التأكد من السماح باستخدام الكاميرا.');
+                    });
+            } else {
+                alert('المتصفح لا يدعم الوصول إلى الكاميرا');
+            }
+        }
+        
+        // الرسم على Canvas
+        drawingCanvas.addEventListener('mousedown', startDrawing);
+        drawingCanvas.addEventListener('touchstart', startDrawing);
+        
+        drawingCanvas.addEventListener('mousemove', draw);
+        drawingCanvas.addEventListener('touchmove', draw);
+        
+        drawingCanvas.addEventListener('mouseup', stopDrawing);
+        drawingCanvas.addEventListener('touchend', stopDrawing);
+        drawingCanvas.addEventListener('mouseout', stopDrawing);
+        
+        function startDrawing(e) {
+            isDrawing = true;
+            draw(e);
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            e.preventDefault();
+            
+            const rect = drawingCanvas.getBoundingClientRect();
+            let x, y;
+            
+            if (e.type.includes('mouse')) {
+                x = e.clientX - rect.left;
+                y = e.clientY - rect.top;
+            } else {
+                x = e.touches[0].clientX - rect.left;
+                y = e.touches[0].clientY - rect.top;
+            }
+            
+            drawingCtx.lineWidth = currentPenSize;
+            drawingCtx.lineCap = 'round';
+            drawingCtx.strokeStyle = currentColor;
+            
+            drawingCtx.lineTo(x, y);
+            drawingCtx.stroke();
+            drawingCtx.beginPath();
+            drawingCtx.moveTo(x, y);
+        }
+        
+        function stopDrawing() {
+            isDrawing = false;
+            drawingCtx.beginPath();
+        }
+        
+        // تغيير لون القلم
+        colorOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                currentColor = option.getAttribute('data-color');
+                
+                // إزالة التحديد من جميع الألوان
+                colorOptions.forEach(opt => {
+                    opt.style.border = '2px solid white';
+                });
+                
+                // إضافة حد أوسع للون المحدد
+                option.style.border = '4px solid white';
+            });
+        });
+        
+        // تغيير حجم القلم
+        penSize.addEventListener('input', () => {
+            currentPenSize = penSize.value;
+        });
+        
+        // مسح الرسم
+        clearBtn.addEventListener('click', () => {
+            drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+        });
+        
+        // حفظ الرسم
+        saveBtn.addEventListener('click', () => {
+            // إنشاء canvas مؤقت لدمج الرسم مع الكاميرا
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = drawingCanvas.width;
+            tempCanvas.height = drawingCanvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // رسم فيديو الكاميرا أولاً
+            tempCtx.drawImage(cameraVideo, 0, 0, tempCanvas.width, tempCanvas.height);
+            
+            // ثم رسم الصورة الشفافة
+            tempCtx.globalAlpha = 0.5;
+            tempCtx.drawImage(overlayCanvas, 0, 0);
+            tempCtx.globalAlpha = 1;
+            
+            // ثم رسم الـ drawing
+            tempCtx.drawImage(drawingCanvas, 0, 0);
+            
+            // تحويل إلى صورة وحفظها
+            const dataURL = tempCanvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = 'رسمتي.png';
+            link.href = dataURL;
+            link.click();
+        });
+        
+        // ضبط أبعاد Canvas عند تغيير حجم النافذة
+        window.addEventListener('resize', () => {
+            if (uploadedImage) {
+                const container = document.querySelector('.camera-container');
+                overlayCanvas.width = container.clientWidth;
+                overlayCanvas.height = container.clientHeight;
+                drawingCanvas.width = container.clientWidth;
+                drawingCanvas.height = container.clientHeight;
+                
+                drawOverlayImage();
+            }
+        });
+    </script>
 </body>
 </html>
